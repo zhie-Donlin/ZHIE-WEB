@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>致一科技 — 後台管理系統</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --navy: #050d1a;
+    --navy2: #0a1628;
+    --navy3: #0f2040;
+    --accent: #00c8ff;
+    --accent-dim: rgba(0,200,255,0.10);
+    --steel: #8ba4c0;
+    --white: #e8f0f8;
+    --card: rgba(15,32,64,0.8);
+    --danger: #e05050;
+    --success: #28c840;
+    --warning: #ffb347;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--navy); color: var(--white); font-family: 'Noto Sans TC', sans-serif; margin: 0; }
+  ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: var(--navy); } ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+
+  /* LOGIN */
+  #login-screen { position:fixed; inset:0; background:var(--navy); display:flex; align-items:center; justify-content:center; z-index:999; }
+  .login-box { background:var(--card); border:1px solid rgba(0,200,255,0.15); border-radius:20px; padding:2.5rem; width:100%; max-width:400px; backdrop-filter:blur(16px); }
+
+  /* SIDEBAR */
+  #sidebar { position:fixed; top:0; left:0; width:240px; height:100vh; background:var(--navy2); border-right:1px solid rgba(0,200,255,0.08); display:flex; flex-direction:column; z-index:50; transition:transform 0.3s; }
+  #sidebar.hidden { transform: translateX(-100%); }
+  .sidebar-logo { padding:1.5rem; border-bottom:1px solid rgba(0,200,255,0.08); display:flex; align-items:center; gap:10px; }
+  .sidebar-logo-text { font-family:'Syne',sans-serif; font-weight:800; font-size:1.1rem; color:#fff; }
+  .sidebar-logo-sub { font-size:0.6rem; color:var(--accent); letter-spacing:0.15em; }
+  .nav-item { display:flex; align-items:center; gap:10px; padding:0.75rem 1.25rem; color:var(--steel); font-size:0.85rem; cursor:pointer; transition:all 0.2s; border-left:3px solid transparent; text-decoration:none; }
+  .nav-item:hover { color:var(--white); background:var(--accent-dim); }
+  .nav-item.active { color:var(--accent); background:var(--accent-dim); border-left-color:var(--accent); }
+  .nav-item i { width:18px; text-align:center; font-size:0.9rem; }
+  .nav-section-label { font-size:0.65rem; letter-spacing:0.15em; color:var(--steel); padding:1rem 1.25rem 0.4rem; text-transform:uppercase; opacity:0.6; }
+  .sidebar-footer { margin-top:auto; padding:1rem 1.25rem; border-top:1px solid rgba(0,200,255,0.08); }
+
+  /* MAIN */
+  #main { margin-left:240px; min-height:100vh; transition:margin 0.3s; }
+  #main.full { margin-left:0; }
+
+  /* TOPBAR */
+  .topbar { background:rgba(5,13,26,0.9); backdrop-filter:blur(16px); border-bottom:1px solid rgba(0,200,255,0.08); padding:0 1.5rem; height:60px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:40; }
+  .topbar-title { font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; color:#fff; }
+  .topbar-right { display:flex; align-items:center; gap:1rem; }
+
+  /* CONTENT */
+  .content { padding:2rem 1.5rem; max-width:1100px; }
+
+  /* CARDS */
+  .stat-card { background:var(--card); border:1px solid rgba(0,200,255,0.08); border-radius:14px; padding:1.5rem; }
+  .stat-card:hover { border-color:rgba(0,200,255,0.2); }
+  .stat-num { font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:800; color:var(--accent); }
+  .stat-label { color:var(--steel); font-size:0.78rem; margin-top:0.25rem; }
+
+  /* FORM */
+  .form-section { background:var(--card); border:1px solid rgba(0,200,255,0.08); border-radius:16px; padding:1.75rem; margin-bottom:1.5rem; }
+  .form-section-title { font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; color:#fff; margin-bottom:0.25rem; display:flex; align-items:center; gap:0.5rem; }
+  .form-section-desc { color:var(--steel); font-size:0.8rem; margin-bottom:1.5rem; }
+  label { display:block; font-size:0.78rem; color:var(--steel); letter-spacing:0.05em; margin-bottom:0.4rem; }
+  input[type=text], input[type=email], input[type=password], input[type=tel], textarea, select {
+    width:100%; background:rgba(255,255,255,0.04); border:1px solid rgba(0,200,255,0.12);
+    border-radius:8px; padding:0.7rem 0.9rem; color:#fff; font-size:0.88rem;
+    font-family:inherit; outline:none; transition:border-color 0.2s; resize:vertical;
+  }
+  input:focus, textarea:focus, select:focus { border-color:rgba(0,200,255,0.4); background:rgba(0,200,255,0.04); }
+  input::placeholder, textarea::placeholder { color:var(--steel); }
+  select option { background:var(--navy2); color:#fff; }
+  .field-group { margin-bottom:1.25rem; }
+
+  /* TABS */
+  .lang-tabs { display:flex; gap:0.5rem; margin-bottom:1.5rem; flex-wrap:wrap; }
+  .lang-tab { padding:0.4rem 1rem; border-radius:6px; font-size:0.78rem; cursor:pointer; border:1px solid rgba(0,200,255,0.15); color:var(--steel); background:none; transition:all 0.2s; }
+  .lang-tab.active { background:var(--accent); color:var(--navy); border-color:var(--accent); font-weight:700; }
+  .lang-tab:hover:not(.active) { color:var(--accent); border-color:rgba(0,200,255,0.3); }
+  .lang-panel { display:none; } .lang-panel.active { display:block; }
+
+  /* BUTTONS */
+  .btn { padding:0.65rem 1.5rem; border-radius:8px; font-size:0.85rem; font-weight:600; cursor:pointer; border:none; transition:all 0.2s; letter-spacing:0.04em; font-family:inherit; }
+  .btn-primary { background:var(--accent); color:var(--navy); }
+  .btn-primary:hover { background:#33d4ff; transform:translateY(-1px); }
+  .btn-secondary { background:transparent; color:var(--accent); border:1px solid rgba(0,200,255,0.3); }
+  .btn-secondary:hover { background:var(--accent-dim); }
+  .btn-danger { background:transparent; color:var(--danger); border:1px solid rgba(224,80,80,0.3); }
+  .btn-danger:hover { background:rgba(224,80,80,0.1); }
+  .btn-sm { padding:0.4rem 0.9rem; font-size:0.78rem; }
+
+  /* TABLE */
+  .data-table { width:100%; border-collapse:collapse; }
+  .data-table th { text-align:left; font-size:0.72rem; color:var(--steel); letter-spacing:0.1em; text-transform:uppercase; padding:0.75rem 1rem; border-bottom:1px solid rgba(0,200,255,0.1); }
+  .data-table td { padding:0.9rem 1rem; font-size:0.85rem; border-bottom:1px solid rgba(255,255,255,0.04); vertical-align:middle; }
+  .data-table tr:hover td { background:rgba(0,200,255,0.03); }
+  .badge { display:inline-block; font-size:0.68rem; padding:0.2rem 0.6rem; border-radius:20px; letter-spacing:0.06em; }
+  .badge-active { background:rgba(40,200,64,0.12); color:var(--success); border:1px solid rgba(40,200,64,0.2); }
+  .badge-draft { background:rgba(255,179,71,0.12); color:var(--warning); border:1px solid rgba(255,179,71,0.2); }
+
+  /* TOAST */
+  #toast { position:fixed; bottom:2rem; right:2rem; background:var(--success); color:#fff; padding:0.85rem 1.5rem; border-radius:10px; font-size:0.85rem; font-weight:600; z-index:999; transform:translateY(100px); opacity:0; transition:all 0.3s; display:flex; align-items:center; gap:0.5rem; }
+  #toast.show { transform:translateY(0); opacity:1; }
+  #toast.error { background:var(--danger); }
+
+  /* PAGE SECTIONS */
+  .admin-page { display:none; } .admin-page.active { display:block; }
+
+  /* PRODUCT ITEM */
+  .product-item { background:var(--card); border:1px solid rgba(0,200,255,0.08); border-radius:12px; padding:1.25rem; margin-bottom:1rem; display:flex; align-items:center; gap:1rem; }
+  .product-item:hover { border-color:rgba(0,200,255,0.2); }
+  .product-dot { width:10px; height:10px; border-radius:50%; background:var(--accent); flex-shrink:0; }
+  .product-info { flex:1; }
+  .product-title { font-weight:700; font-size:0.9rem; color:#fff; }
+  .product-meta { font-size:0.78rem; color:var(--steel); margin-top:0.2rem; }
+  .product-actions { display:flex; gap:0.5rem; }
+
+  /* MODAL */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:200; display:none; align-items:center; justify-content:center; padding:1rem; }
+  .modal-overlay.open { display:flex; }
+  .modal { background:var(--navy2); border:1px solid rgba(0,200,255,0.15); border-radius:18px; padding:2rem; width:100%; max-width:600px; max-height:90vh; overflow-y:auto; }
+  .modal-title { font-family:'Syne',sans-serif; font-weight:700; font-size:1.1rem; color:#fff; margin-bottom:1.5rem; display:flex; justify-content:space-between; align-items:center; }
+
+  /* MOBILE */
+  #sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:49; }
+  @media(max-width:768px){
+    #sidebar { transform:translateX(-100%); }
+    #sidebar.mobile-open { transform:translateX(0); }
+    #sidebar-overlay.show { display:block; }
+    #main { margin-left:0; }
+    .content { padding:1rem; }
+    .topbar { padding:0 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== LOGIN ========== -->
+<div id="login-screen">
+  <div class="login-box">
+    <div style="text-align:center;margin-bottom:2rem;">
+      <img src="./logo.png" alt="ZHIE Technology" style="height:72px;width:auto;object-fit:contain;margin:0 auto 1rem;display:block;filter:drop-shadow(0 2px 12px rgba(0,0,0,0.4));"/>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:#fff;">後台管理系統</div>
+      <div style="color:var(--steel);font-size:0.8rem;margin-top:0.3rem;">ZHIE CO., LTD. Admin Panel</div>
+    </div>
+    <div class="field-group">
+      <label>管理員帳號</label>
+      <input type="text" id="login-user" placeholder="zhie" value="zhie"/>
+    </div>
+    <div class="field-group">
+      <label>密碼</label>
+      <input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <div id="login-error" style="color:var(--danger);font-size:0.8rem;margin-bottom:1rem;display:none;">
+      <i class="fa-solid fa-circle-exclamation"></i> 帳號或密碼錯誤
+    </div>
+    <button class="btn btn-primary" style="width:100%;font-size:0.95rem;padding:0.85rem;" onclick="doLogin()">
+      <i class="fa-solid fa-right-to-bracket" style="margin-right:6px;"></i>登入
+    </button>
+    <p style="color:var(--steel);font-size:0.75rem;text-align:center;margin-top:1.25rem;">如需重設帳號密碼，請聯繫網站管理員</p>
+  </div>
+</div>
+
+<!-- ========== SIDEBAR ========== -->
+<div id="sidebar-overlay" onclick="closeSidebar()"></div>
+<div id="sidebar">
+  <div class="sidebar-logo">
+    <img src="./logo.png" alt="ZHIE" style="height:40px;width:auto;object-fit:contain;filter:drop-shadow(0 1px 6px rgba(0,0,0,0.4));"/>
+    <div>
+      <div class="sidebar-logo-text">Admin</div>
+      <div class="sidebar-logo-sub">管理後台</div>
+    </div>
+  </div>
+
+  <div style="padding:1rem 0;flex:1;overflow-y:auto;">
+    <div class="nav-section-label">主選單</div>
+    <a class="nav-item active" onclick="showPage('dashboard')">
+      <i class="fa-solid fa-gauge"></i> 儀表板
+    </a>
+    <a class="nav-item" onclick="showPage('about')">
+      <i class="fa-solid fa-building"></i> 關於我們
+    </a>
+    <a class="nav-item" onclick="showPage('products')">
+      <i class="fa-solid fa-display"></i> 產品管理
+    </a>
+    <a class="nav-item" onclick="showPage('solutions')">
+      <i class="fa-solid fa-lightbulb"></i> 解決方案
+    </a>
+    <a class="nav-item" onclick="showPage('contact')">
+      <i class="fa-solid fa-address-card"></i> 聯絡資訊
+    </a>
+    <div class="nav-section-label" style="margin-top:0.5rem;">語言管理</div>
+    <a class="nav-item" onclick="showPage('lang')">
+      <i class="fa-solid fa-language"></i> 多語言設定
+    </a>
+    <div class="nav-section-label" style="margin-top:0.5rem;">系統</div>
+    <a class="nav-item" onclick="showPage('settings')">
+      <i class="fa-solid fa-gear"></i> 系統設定
+    </a>
+  </div>
+
+  <div class="sidebar-footer">
+    <button class="nav-item" style="width:100%;border:none;" onclick="doLogout()">
+      <i class="fa-solid fa-right-from-bracket"></i> 登出
+    </button>
+  </div>
+</div>
+
+<!-- ========== MAIN ========== -->
+<div id="main">
+  <!-- Topbar -->
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <button onclick="toggleSidebar()" style="background:none;border:none;color:var(--steel);cursor:pointer;font-size:1.1rem;padding:4px;">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <span class="topbar-title" id="page-title">儀表板</span>
+    </div>
+    <div class="topbar-right">
+      <a href="1.html" target="_blank" style="color:var(--accent);font-size:0.8rem;text-decoration:none;display:flex;align-items:center;gap:5px;border:1px solid rgba(0,200,255,0.2);padding:0.35rem 0.85rem;border-radius:6px;">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i> 預覽網站
+      </a>
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--accent-dim);border:1px solid rgba(0,200,255,0.2);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:0.8rem;">
+        <i class="fa-solid fa-user"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ====== DASHBOARD ====== -->
+    <div id="page-dashboard" class="admin-page active">
+      <div style="margin-bottom:2rem;">
+        <h1 style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:#fff;margin-bottom:0.25rem;">歡迎回來 👋</h1>
+        <p style="color:var(--steel);font-size:0.88rem;">致一科技網站後台管理系統</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:2rem;">
+        <div class="stat-card">
+          <div style="color:var(--accent);font-size:1.5rem;margin-bottom:0.75rem;"><i class="fa-solid fa-display"></i></div>
+          <div class="stat-num">6</div>
+          <div class="stat-label">產品項目</div>
+        </div>
+        <div class="stat-card">
+          <div style="color:#50ff78;font-size:1.5rem;margin-bottom:0.75rem;"><i class="fa-solid fa-lightbulb"></i></div>
+          <div class="stat-num" style="color:#50ff78;">5</div>
+          <div class="stat-label">解決方案</div>
+        </div>
+        <div class="stat-card">
+          <div style="color:#ffc800;font-size:1.5rem;margin-bottom:0.75rem;"><i class="fa-solid fa-language"></i></div>
+          <div class="stat-num" style="color:#ffc800;">4</div>
+          <div class="stat-label">支援語言</div>
+        </div>
+        <div class="stat-card">
+          <div style="color:#b088ff;font-size:1.5rem;margin-bottom:0.75rem;"><i class="fa-solid fa-clock-rotate-left"></i></div>
+          <div class="stat-num" style="color:#b088ff;" id="last-save">--</div>
+          <div class="stat-label">上次儲存</div>
+        </div>
+      </div>
+
+      <!-- Quick actions -->
+      <div class="form-section">
+        <div class="form-section-title"><i class="fa-solid fa-bolt" style="color:var(--accent);"></i> 快速編輯</div>
+        <div class="form-section-desc">點擊直接跳到各區塊編輯</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;">
+          <button class="btn btn-secondary" onclick="showPage('about')" style="text-align:left;display:flex;align-items:center;gap:0.75rem;">
+            <i class="fa-solid fa-building"></i> 編輯公司簡介
+          </button>
+          <button class="btn btn-secondary" onclick="showPage('products')" style="text-align:left;display:flex;align-items:center;gap:0.75rem;">
+            <i class="fa-solid fa-display"></i> 管理產品資訊
+          </button>
+          <button class="btn btn-secondary" onclick="showPage('solutions')" style="text-align:left;display:flex;align-items:center;gap:0.75rem;">
+            <i class="fa-solid fa-lightbulb"></i> 編輯解決方案
+          </button>
+          <button class="btn btn-secondary" onclick="showPage('contact')" style="text-align:left;display:flex;align-items:center;gap:0.75rem;">
+            <i class="fa-solid fa-address-card"></i> 更新聯絡資訊
+          </button>
+        </div>
+      </div>
+
+      <!-- Notice -->
+      <div style="background:rgba(0,200,255,0.06);border:1px solid rgba(0,200,255,0.15);border-radius:12px;padding:1.25rem;display:flex;gap:1rem;align-items:flex-start;">
+        <i class="fa-solid fa-circle-info" style="color:var(--accent);margin-top:2px;flex-shrink:0;"></i>
+        <div>
+          <div style="font-weight:700;font-size:0.9rem;color:#fff;margin-bottom:0.3rem;">關於 Supabase 資料庫串接</div>
+          <div style="color:var(--steel);font-size:0.83rem;line-height:1.7;">目前後台為本地儲存版本（LocalStorage）。若需要將資料同步到網站前台，請在「系統設定」中填入 Supabase 連線資訊後啟用雲端同步。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== ABOUT ====== -->
+    <div id="page-about" class="admin-page">
+      <h1 style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:#fff;margin-bottom:0.25rem;">關於我們</h1>
+      <p style="color:var(--steel);font-size:0.85rem;margin-bottom:1.5rem;">編輯公司簡介、核心理念與歷史沿革</p>
+
+      <div class="lang-tabs">
+        <button class="lang-tab active" onclick="switchLang('about','zh-TW',this)">繁體中文</button>
+        <button class="lang-tab" onclick="switchLang('about','zh-CN',this)">简体中文</button>
+        <button class="lang-tab" onclick="switchLang('about','en',this)">English</button>
+        <button class="lang-tab" onclick="switchLang('about','ja',this)">日本語</button>
+      </div>
+
+      <!-- zh-TW -->
+      <div id="about-zh-TW" class="lang-panel active">
+        <div class="form-section">
+          <div class="form-section-title"><i class="fa-solid fa-building" style="color:var(--accent);"></i> 公司基本資訊</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="field-group">
+              <label>公司名稱（中文）</label>
+              <input type="text" id="about-name-tw" value="致一科技股份有限公司"/>
+            </div>
+            <div class="field-group">
+              <label>公司名稱（英文）</label>
+              <input type="text" id="about-name-en" value="ZHIE CO.,LTD."/>
+            </div>
+            <div class="field-group">
+              <label>成立年份</label>
+              <input type="text" id="about-year" value="2017"/>
+            </div>
+            <div class="field-group">
+              <label>員工人數</label>
+              <input type="text" id="about-staff" value="15+ 年資深團隊"/>
+            </div>
+          </div>
+          <div class="field-group">
+            <label>公司標語 / Slogan</label>
+            <input type="text" id="about-slogan-tw" value="專注、品質、誠信 — 您最信賴的光電技術夥伴"/>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title"><i class="fa-solid fa-align-left" style="color:var(--accent);"></i> 公司簡介段落</div>
+          <div class="field-group">
+            <label>第一段</label>
+            <textarea id="about-p1-tw" rows="4">致一科技由資深研發負責人於 2017 年創立，核心團隊成員均擁有超過 15 年以上的光電顯示產業資歷。公司以研發能力為核心競爭力，專精於 LCD Module 與電容式觸控屏的設計開發。</textarea>
+          </div>
+          <div class="field-group">
+            <label>第二段</label>
+            <textarea id="about-p2-tw" rows="4">我們從事各類顯示產品，包括 Mono 黑白液晶顯示模組及 TFT 彩色顯示模組，涵蓋周邊電子電路設計，提供完整的客製化液晶顯示與觸控屏解決方案，滿足客戶特定的技術與設計需求。</textarea>
+          </div>
+          <div class="field-group">
+            <label>第三段</label>
+            <textarea id="about-p3-tw" rows="4">我們整合內外部資源，以客制化研發、彈性生產、即時交貨，提供「品質第一，顧客滿意」高附加價值的產品與優質服務。</textarea>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title"><i class="fa-solid fa-star" style="color:var(--accent);"></i> 核心理念</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="field-group">
+              <label>理念一</label>
+              <input type="text" id="val1-tw" value="誠信 Integrity"/>
+            </div>
+            <div class="field-group">
+              <label>說明</label>
+              <input type="text" id="val1d-tw" value="誠信是我們與客戶、合作夥伴建立長期關係的基石"/>
+            </div>
+            <div class="field-group">
+              <label>理念二</label>
+              <input type="text" id="val2-tw" value="服務 Service"/>
+            </div>
+            <div class="field-group">
+              <label>說明</label>
+              <input type="text" id="val2d-tw" value="以客戶需求為優先，快速響應技術問題"/>
+            </div>
+            <div class="field-group">
+              <label>理念三</label>
+              <input type="text" id="val3-tw" value="品質 Quality"/>
+            </div>
+            <div class="field-group">
+              <label>說明</label>
+              <input type="text" id="val3d-tw" value="嚴格執行品質管控，唯一與滿意是最高宗旨"/>
+            </div>
+            <div class="field-group">
+              <label>理念四</label>
+              <input type="text" id="val4-tw" value="負責 Responsibility"/>
+            </div>
+            <div class="field-group">
+              <label>說明</label>
+              <input type="text" id="val4d-tw" value="對每個專案負責到底，全程承擔技術責任"/>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- zh-CN -->
+      <div id="about-zh-CN" class="lang-panel">
+        <div class="form-section">
+          <div class="form-section-title"><i class="fa-solid fa-align-left" style="color:var(--accent);"></i> 公司简介（简体中文）</div>
+          <div class="field-group"><label>第一段</label><textarea id="about-p1-cn" rows="4">致一科技由资深研发负责人于 2017 年创立，核心团队成员均拥有超过 15 年以上的光电显示产业资历。</textarea></div>
+          <div class="field-group"><label>第二段</label><textarea id="about-p2-cn" rows="4">我们从事各类显示产品，包括 Mono 黑白液晶显示模组及 TFT 彩色显示模组，提供完整的定制化解决方案。</textarea></div>
+        </div>
+      </div>
+
+      <!-- en -->
+      <div id="about-en" class="lang-panel">
+        <div class="form-section">
+          <div class="form-section-title"><i class="fa-solid fa-align-left" style="color:var(--accent);"></i> Company Profile (English)</div>
+          <div class="field-group"><label>Paragraph 1</label><textarea id="about-p1-en" rows="4">ZHIE Technology was founded in 2017 by a senior R&D specialist. The core team holds 15+ years of experience in the optoelectronics industry.</textarea></div>
+          <div class="field-group"><label>Paragraph 2</label><textarea id="about-p2-en" rows="4">We develop all types of display products including Mono LCD modules and TFT color display modules, delivering complete customized solutions.</textarea></div>
+        </div>
+      </div>
+
+      <!-- ja -->
+      <div id="about-ja" class="lang-panel">
+        <div class="form-section">
+          <div class="form-section-title"><i class="fa-solid fa-align-left" style="color:var(--accent);"></i> 会社概要（日本語）</div>
+          <div class="field-group"><label>第一段落</label><textarea id="about-p1-ja" rows="4">ZHIE Technologyは2017年に経験豊富なR&D専門家によって設立されました。コアチームは15年以上の光電ディスプレイ産業経験を持ちます。</textarea></div>
+          <div class="field-group"><label>第二段落</label><textarea id="about-p2-ja" rows="4">モノクロLCDモジュールからTFTカラーモジュールまで、完全なカスタマイズソリューションを提供します。</textarea></div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="saveSection('about')"><i class="fa-solid fa-floppy-disk" style="margin-right:6px;"></i>儲存變更</button>
+        <button class="btn btn-secondary" onclick="resetSection('about')"><i class="fa-solid fa-rotate-left" style="margin-right:6px;"></i>還原預設</button>
+      </div>
+    </div>
+
+    <!-- ====== PRODUCTS ====== -->
+    <div id="page-products" class="admin-page">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+        <div>
+          <h1 style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:#fff;margin-bottom:0.25rem;">產品管理</h1>
+          <p style="color:var(--steel);font-size:0.85rem;">新增、編輯或刪除產品項目</p>
+        </div>
+        <button class="btn btn-primary" onclick="openProductModal()"><i class="fa-solid fa-plus" style="margin-right:6px;"></i>新增產品</button>
+      </div>
+
+      <div id="products-list"><div style="color:var(--steel);font-size:0.85rem;padding:1.5rem;text-align:center;"><i class="fa-solid fa-spinner fa-spin" style="margin-right:8px;"></i>載入中...</div></div>
+    </div>
+
+    <!-- ====== SOLUTIONS ====== -->
+    <div id="page-solutions" class="admin-page">
+      <h1 style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:#fff;margin-bottom:0.25rem;">解決方案</h1>
+      <p style="color:var(--steel);font-size:0.85rem;margin-bottom:1.5rem;">編輯各產業應用說明</p>
+      <div class="form-section">
+        <div class="form-section-title"><i class="fa-solid fa-industry" style="color:var(--accent);"></i> 工業控制</div>
+        <div class="field-group"><label>標題</label><input type="text" value="工業控制 Industrial Control"/></div>
+        <div class="field-group"><label>說明內容</label><textarea rows="3">提供工控 HMI 面板、PLC 控制器顯示介面、工業儀表等應用的顯示模組解決方案。支援寬溫（-40°C～85°C）設計，抗電磁干擾，符合工業級可靠性要求。</textarea></div>
+        <div class="field-group"><label>標籤（用逗號分隔）</label><input type="text" value="HMI 面板, 工業儀表, PLC 顯示器"/></div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title"><i class="fa-solid fa-hospital" style="color:var(--accent);"></i> 醫療儀器</div>
+        <div class="field-group"><label>標題</label><input type="text" value="醫療儀器 Medical Equipment"/></div>
+        <div class="field-group"><label>說明內容</label><textarea rows="3">針對醫療器材顯示需求，提供高可靠性、低電磁輻射、高對比度顯示模組。符合醫療設備對顯示清晰度及穩定性的嚴格要求，支援特殊尺寸定制。</textarea></div>
+        <div class="field-group"><label>標籤（用逗號分隔）</label><input type="text" value="醫療顯示器, 生命體征監測, 可攜式設備"/></div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title"><i class="fa-solid fa-car" style="color:var(--accent);"></i> 車載顯示</div>
+        <div class="field-group"><label>標題</label><input type="text" value="車載顯示 Automotive Display"/></div>
+        <div class="field-group"><label>說明內容</label><textarea rows="3">車載顯示模組需通過嚴格的環境測試，我們提供符合車規寬溫設計，抗震動、防濕氣、高亮度（可達 1000nit+）顯示模組。</textarea></div>
+        <div class="field-group"><label>標籤（用逗號分隔）</label><input type="text" value="儀表板顯示, 車載娛樂, 觸控導航"/></div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title"><i class="fa-solid fa-house" style="color:var(--accent);"></i> 智慧家居</div>
+        <div class="field-group"><label>標題</label><input type="text" value="智慧家居 Smart Home"/></div>
+        <div class="field-group"><label>說明內容</label><textarea rows="3">為智慧家居控制面板、環境感測器顯示介面提供美觀、低功耗的觸控顯示模組。支援超薄邊框設計，色彩還原精準，觸控靈敏。</textarea></div>
+        <div class="field-group"><label>標籤（用逗號分隔）</label><input type="text" value="智慧面板, 觸控螢幕, 環境感測顯示"/></div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title"><i class="fa-solid fa-mobile" style="color:var(--accent);"></i> 消費性電子</div>
+        <div class="field-group"><label>標題</label><input type="text" value="消費性電子 Consumer Electronics"/></div>
+        <div class="field-group"><label>說明內容</label><textarea rows="3">為穿戴式裝置、手持測量儀器、電子標籤等消費性產品提供輕薄、省電、高性能的顯示模組方案，支援快速打樣及彈性量產。</textarea></div>
+        <div class="field-group"><label>標籤（用逗號分隔）</label><input type="text" value="穿戴裝置, 手持儀器, 電子標籤"/></div>
+      </div>
+      <button class="btn btn-primary" onclick="saveSection('solutions')"><i class="fa-solid fa-floppy-disk" style="margin-right:6px;"></i>儲存所有變更</button>
+    </div>
+
+    <!-- ====== CONTACT ====== -->
+    <div id="page-contact" class="admin-page">
+      <h1 style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:#fff;margin-bottom:0.25rem;">聯絡資訊</h1>
+      <p style="color:var(--steel);font-size:0.85rem;margin-bottom:1.5rem;">更新公司聯絡方式與地址</p>
+      <div class="form-section">
+        <div class="form-section-title"><i class="fa-solid fa-address-card" style="color:var(--accent);"></i> 基本聯絡資料</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div class="field-group">
+            <label><i class="fa-solid fa-phone" style="color:var(--accent);margin-right:6px;"></i>電話</label>
+            <input type="tel" id="c-phone" value="02-2771-8076"/>
+          </div>
+          <div class="field-group">
+            <label><i class="fa-solid fa-envelope" style="color:var(--accent);margin-right:6px;"></i>電子信箱</label>
+            <input type="email" id="c-email" value="zhie@zhietech.com"/>
+          </div>
+          <div class="field-group">
+            <label><i class="fa-solid fa-clock" style="color:var(--accent);margin-right:6px;"></i>營業時間（繁中）</label>
+            <input type="text" id="c-hours-tw" value="週一至週五 09:00–18:00"/>
+          </div>
+          <div class="field-group">
+            <label><i class="fa-solid fa-clock" style="color:var(--accent);margin-right:6px;"></i>營業時間（英文）</label>
+            <input type="text" id="c-hours-en" value="Monday–Friday 09:00–18:00"/>
+          </div>
+        </div>
+        <div class="field-group">
+          <label><i class="fa-solid fa-location-dot" style="color:var(--accent);margin-right:6px;"></i>公司地址</label>
+          <input type="text" id="c-addr" value="221 新北市汐止區福德一路405巷5號"/>
+        </div>
+        <div class="field-group">
+          <label><i class="fa-solid fa-map" style="color:var(--accent);margin-right:6px;"></i>Google Maps 連結</label>
+          <input type="text" id="c-map" value="https://maps.google.com.tw/maps?hl=zh-TW&q=221+新北市汐止區福德一路405巷5號&z=18"/>
+        </div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title"><i class="fa-solid fa-share-nodes" style="color:var(--accent);"></i> 其他聯絡方式（選填）</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div class="field-group"><label>LINE ID</label><input type="text" placeholder="LINE ID（選填）"/></div>
+          <div class="field-group"><label>WeChat ID</label><input type="text" placeholder="WeChat ID（選填）"/></div>
+          <div class="field-group"><label>LinkedIn</label><input type="text" placeholder="LinkedIn 網址（選填）"/></div>
+          <div class="field-group"><label>官方網站</label><input type="text" value="https://www.zhietech.com"/></div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="saveSection('contact')"><i class="fa-solid fa-floppy-disk" style="margin-right:6px;"></i>儲存聯絡資訊</button>
+    </div>
+
+    <!-- ====== LANG ====== -->
+    <div id="page-lang" class="admin-page">
+      <h1 style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:#fff;margin-bottom:0.25rem;">多語言設定</h1>
+      <p style="color:var(--steel);font-size:0.85rem;margin-bottom:1.5rem;">管理網站顯示語言</p>
+      <div class="form-section">
+        <div class="form-section-title"><i class="fa-solid fa-language" style="color:var(--accent);"></i> 語言開關</div>
+        <div class="form-section-desc">關閉後該語言選項將不顯示在前台</div>
+        <div style="display:flex;flex-direction:column;gap:1rem;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:1rem;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid rgba(0,200,255,0.08);">
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              <span style="font-size:1.2rem;">🇹🇼</span>
+              <div><div style="font-weight:600;font-size:0.9rem;">繁體中文</div><div style="font-size:0.75rem;color:var(--steel);">Traditional Chinese</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.5rem;"><span class="badge badge-active">預設語言</span></div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:1rem;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid rgba(0,200,255,0.08);">
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              <span style="font-size:1.2rem;">🇨🇳</span>
+              <div><div style="font-weight:600;font-size:0.9rem;">简体中文</div><div style="font-size:0.75rem;color:var(--steel);">Simplified Chinese</div></div>
+            </div>
+            <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;margin:0;"><input type="checkbox" checked style="width:auto;"/> <span style="font-size:0.8rem;color:var(--steel);">啟用</span></label>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:1rem;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid rgba(0,200,255,0.08);">
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              <span style="font-size:1.2rem;">🇺🇸</span>
+              <div><div style="font-weight:600;font-size:0.9rem;">English</div><div style="font-size:0.75rem;color:var(--steel);">English</div></div>
+            </div>
+            <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;margin:0;"><input type="checkbox" checked style="width:auto;"/> <span style="font-size:0.8rem;color:var(--steel);">啟用</span></label>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:1rem;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid rgba(0,200,255,0.08);">
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              <span style="font-size:1.2rem;">🇯🇵</span>
+              <div><div style="font-weight:600;font-size:0.9rem;">日本語</div><div style="font-size:0.75rem;color:var(--steel);">Japanese</div></div>
+            </div>
+            <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;margin:0;"><input type="checkbox" checked style="width:auto;"/> <span style="font-size:0.8rem;color:var(--steel);">啟用</span></label>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="saveSection('lang')"><i class="fa-solid fa-floppy-disk" style="margin-right:6px;"></i>儲存設定</button>
+    </div>
+
+    <!-- ====== SETTINGS ====== -->
+    <div id="page-settings" class="admin-page">
+      <h1 style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:#fff;margin-bottom:0.25rem;">系統設定</h1>
+      <p style="color:var(--steel);font-size:0.85rem;margin-bottom:1.5rem;">管理員帳號、Supabase 連線設定</p>
+      <div class="form-section">
+        <div class="form-section-title"><i class="fa-solid fa-user-shield" style="color:var(--accent);"></i> 管理員帳號</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div class="field-group"><label>管理員帳號</label><input type="text" id="set-user" value="zhie"/></div>
+          <div class="field-group"><label>新密碼</label><input type="password" id="set-pass" placeholder="輸入新密碼"/></div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="saveAdminAccount()"><i class="fa-solid fa-floppy-disk" style="margin-right:6px;"></i>更新帳號</button>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title"><i class="fa-solid fa-database" style="color:var(--accent);"></i> Supabase 雲端資料庫</div>
+        <div class="form-section-desc">填入後可將後台資料同步到 Supabase，讓前台即時顯示最新內容</div>
+        <div class="field-group"><label>Supabase Project URL</label><input type="text" id="sb-url" placeholder="https://xxxxxxxx.supabase.co"/></div>
+        <div class="field-group"><label>Supabase Anon Key</label><input type="text" id="sb-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."/></div>
+        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+          <button class="btn btn-secondary btn-sm" onclick="testSupabase()"><i class="fa-solid fa-plug" style="margin-right:6px;"></i>測試連線</button>
+          <button class="btn btn-primary btn-sm" onclick="saveSupabase()"><i class="fa-solid fa-floppy-disk" style="margin-right:6px;"></i>儲存設定</button>
+        </div>
+        <div id="sb-status" style="margin-top:0.75rem;font-size:0.8rem;display:none;"></div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title"><i class="fa-solid fa-paint-roller" style="color:var(--accent);"></i> 網站外觀</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div class="field-group"><label>網站標題</label><input type="text" value="致一科技 ZHIE CO.,LTD."/></div>
+          <div class="field-group"><label>SEO 描述</label><input type="text" value="專業LCD Module與電容式觸控屏設計開發"/></div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="saveSection('settings')"><i class="fa-solid fa-floppy-disk" style="margin-right:6px;"></i>儲存</button>
+      </div>
+    </div>
+
+  </div><!-- end content -->
+</div><!-- end main -->
+
+<!-- ====== PRODUCT MODAL ====== -->
+<div class="modal-overlay" id="product-modal">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="modal-title-text">新增產品</span>
+      <button onclick="closeProductModal()" style="background:none;border:none;color:var(--steel);cursor:pointer;font-size:1.1rem;"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <!-- 產品圖片上傳 -->
+    <div class="field-group">
+      <label>產品圖片</label>
+      <div id="img-upload-area" onclick="document.getElementById('m-img-file').click()"
+        style="border:2px dashed rgba(0,200,255,0.25);border-radius:10px;padding:1.5rem;text-align:center;cursor:pointer;transition:all 0.2s;background:rgba(0,200,255,0.03);"
+        onmouseover="this.style.borderColor='rgba(0,200,255,0.5)';this.style.background='rgba(0,200,255,0.07)'"
+        onmouseout="this.style.borderColor='rgba(0,200,255,0.25)';this.style.background='rgba(0,200,255,0.03)'">
+        <div id="img-preview-wrap" style="display:none;margin-bottom:0.75rem;">
+          <img id="img-preview" src="" style="max-height:140px;border-radius:8px;max-width:100%;object-fit:contain;"/>
+        </div>
+        <div id="img-placeholder">
+          <i class="fa-solid fa-cloud-arrow-up" style="font-size:2rem;color:var(--accent);margin-bottom:0.5rem;display:block;"></i>
+          <div style="color:var(--white);font-size:0.88rem;font-weight:600;">點擊選擇圖片</div>
+          <div style="color:var(--steel);font-size:0.75rem;margin-top:0.3rem;">支援 JPG、PNG、WEBP，建議尺寸 800×500px</div>
+        </div>
+        <input type="file" id="m-img-file" accept="image/*" style="display:none;" onchange="previewImage(this)"/>
+      </div>
+      <div id="img-upload-status" style="font-size:0.78rem;margin-top:0.5rem;display:none;"></div>
+      <input type="hidden" id="m-img-url" value=""/>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+      <div class="field-group"><label>產品名稱（中文）</label><input type="text" id="m-name-tw" placeholder="例：5.0&quot; TFT 彩色顯示模組"/></div>
+      <div class="field-group"><label>產品名稱（英文）</label><input type="text" id="m-name-en" placeholder="e.g. 5.0&quot; TFT Color Display Module"/></div>
+    </div>
+    <div class="field-group"><label>規格說明</label><input type="text" id="m-spec" placeholder="例：800×480 / RGB / 可含觸控"/></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+      <div class="field-group"><label>產品類別</label>
+        <select id="m-cat">
+          <option value="mono">Mono LCM</option>
+          <option value="tft">TFT 彩色</option>
+          <option value="touch">觸控模組</option>
+          <option value="custom">客製化</option>
+        </select>
+      </div>
+      <div class="field-group"><label>狀態</label>
+        <select id="m-status">
+          <option value="active">上架中</option>
+          <option value="draft">草稿</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-group"><label>詳細描述</label><textarea id="m-desc" rows="3" placeholder="產品詳細說明..."></textarea></div>
+
+    <div style="display:flex;gap:0.75rem;margin-top:1.5rem;flex-wrap:wrap;">
+      <button class="btn btn-primary" id="save-product-btn" onclick="saveProduct()"><i class="fa-solid fa-floppy-disk" style="margin-right:6px;"></i>儲存產品</button>
+      <button class="btn btn-secondary" onclick="closeProductModal()">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== TOAST ====== -->
+<div id="toast"><i class="fa-solid fa-check"></i> <span id="toast-msg">儲存成功！</span></div>
+
+<script>
+// ======================== AUTH ========================
+var ADMIN_USER = localStorage.getItem('zhie_admin_user') || 'zhie';
+var ADMIN_PASS = localStorage.getItem('zhie_admin_pass') || 'zhie68467475';
+
+function doLogin() {
+  var u = document.getElementById('login-user').value;
+  var p = document.getElementById('login-pass').value;
+  if (u === ADMIN_USER && p === ADMIN_PASS) {
+    document.getElementById('login-screen').style.display = 'none';
+    updateLastSave();
+    loadProducts();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+  }
+}
+
+function doLogout() {
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-pass').value = '';
+  document.getElementById('login-error').style.display = 'none';
+}
+
+function saveAdminAccount() {
+  var u = document.getElementById('set-user').value;
+  var p = document.getElementById('set-pass').value;
+  if (u) { ADMIN_USER = u; localStorage.setItem('zhie_admin_user', u); }
+  if (p) { ADMIN_PASS = p; localStorage.setItem('zhie_admin_pass', p); }
+  showToast('帳號資訊已更新！');
+}
+
+// ======================== NAVIGATION ========================
+function showPage(name) {
+  document.querySelectorAll('.admin-page').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+  var page = document.getElementById('page-' + name);
+  if (page) page.classList.add('active');
+  var titles = { dashboard:'儀表板', about:'關於我們', products:'產品管理', solutions:'解決方案', contact:'聯絡資訊', lang:'多語言設定', settings:'系統設定' };
+  document.getElementById('page-title').textContent = titles[name] || name;
+  if (name === 'products') loadProducts();
+  // Activate sidebar item
+  document.querySelectorAll('.nav-item').forEach(function(n){
+    if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'"+name+"'")) n.classList.add('active');
+  });
+  // Close mobile sidebar
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
+  window.scrollTo(0,0);
+}
+
+function toggleSidebar() {
+  var sb = document.getElementById('sidebar');
+  var overlay = document.getElementById('sidebar-overlay');
+  if (window.innerWidth <= 768) {
+    sb.classList.toggle('mobile-open');
+    overlay.classList.toggle('show');
+  }
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
+}
+
+// ======================== LANG TABS ========================
+function switchLang(section, lang, btn) {
+  document.querySelectorAll('#page-' + section + ' .lang-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('#page-' + section + ' .lang-tab').forEach(function(b){ b.classList.remove('active'); });
+  var panel = document.getElementById(section + '-' + lang);
+  if (panel) panel.classList.add('active');
+  btn.classList.add('active');
+}
+
+// ======================== SAVE ========================
+function saveSection(name) {
+  // Save to localStorage
+  var data = {};
+  var inputs = document.querySelectorAll('#page-' + name + ' input, #page-' + name + ' textarea, #page-' + name + ' select');
+  inputs.forEach(function(el, i){
+    if (el.id) data[el.id] = el.type === 'checkbox' ? el.checked : el.value;
+  });
+  localStorage.setItem('zhie_' + name, JSON.stringify(data));
+  updateLastSave();
+  showToast('「' + { about:'關於我們', products:'產品', solutions:'解決方案', contact:'聯絡資訊', lang:'語言設定', settings:'系統設定' }[name] + '」已儲存！');
+}
+
+function resetSection(name) {
+  if (confirm('確定要還原為預設值嗎？')) {
+    localStorage.removeItem('zhie_' + name);
+    showToast('已還原預設值', true);
+    setTimeout(function(){ location.reload(); }, 1000);
+  }
+}
+
+function updateLastSave() {
+  var el = document.getElementById('last-save');
+  if (!el) return;
+  var now = new Date();
+  el.textContent = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+}
+
+// Load saved data on init
+function loadSavedData() {
+  ['about','contact','solutions','lang','settings'].forEach(function(section){
+    var saved = localStorage.getItem('zhie_' + section);
+    if (!saved) return;
+    var data = JSON.parse(saved);
+    Object.keys(data).forEach(function(id){
+      var el = document.getElementById(id);
+      if (!el) return;
+      if (el.type === 'checkbox') el.checked = data[id];
+      else el.value = data[id];
+    });
+  });
+}
+loadSavedData();
+
+// ======================== SUPABASE CONFIG ========================
+// 【步驟1】登入 supabase.com → 選你的專案 → 左側選 Project Settings → API
+// → 複製「Project URL」貼在下方引號內（取代整段 https://...supabase.co）
+// 【步驟2】同一個 API 頁面 → 往下找「anon public」那欄 → 複製該 key 貼在第二行引號內
+// 若你已在後台系統設定頁面填入並儲存，這兩行會自動從 localStorage 讀取，不用改這裡
+var SB_URL = localStorage.getItem('zhie_sb_url') || 'https://jlrapmlgxxighsqlziru.supabase.co';
+var SB_KEY = localStorage.getItem('zhie_sb_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpscmFwbWxneHhpZ2hzcWx6aXJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NjYzMjIsImV4cCI6MjA5NjE0MjMyMn0.57kKgbI8FTK3J_olPu55GBJpZrB6DP_bkyx6oqymLzo';
+
+// ======================== IMAGE PREVIEW ========================
+function previewImage(input) {
+  if (!input.files || !input.files[0]) return;
+  var file = input.files[0];
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('img-preview').src = e.target.result;
+    document.getElementById('img-preview-wrap').style.display = 'block';
+    document.getElementById('img-placeholder').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+// ======================== UPLOAD IMAGE TO SUPABASE ========================
+async function uploadImageToSupabase(file) {
+  var status = document.getElementById('img-upload-status');
+  status.style.display = 'block';
+  status.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="color:var(--accent);margin-right:6px;"></i>圖片上傳中...';
+
+  var ext = file.name.split('.').pop();
+  var fileName = 'product_' + Date.now() + '.' + ext;
+
+  try {
+    var res = await fetch(SB_URL + '/storage/v1/object/products/' + fileName, {
+      method: 'POST',
+      headers: {
+        'apikey': SB_KEY,
+        'Authorization': 'Bearer ' + SB_KEY,
+        'Content-Type': file.type,
+        'x-upsert': 'true'
+      },
+      body: file
+    });
+
+    if (!res.ok) {
+      var err = await res.text();
+      throw new Error(err);
+    }
+
+    var publicUrl = SB_URL + '/storage/v1/object/public/products/' + fileName;
+    document.getElementById('m-img-url').value = publicUrl;
+    status.innerHTML = '<i class="fa-solid fa-check" style="color:var(--success);margin-right:6px;"></i>圖片上傳成功！';
+    return publicUrl;
+
+  } catch(e) {
+    status.innerHTML = '<i class="fa-solid fa-xmark" style="color:var(--danger);margin-right:6px;"></i>上傳失敗：' + e.message;
+    return null;
+  }
+}
+
+// ======================== PRODUCT CRUD (Supabase) ========================
+
+// 載入產品列表
+async function loadProducts() {
+  var list = document.getElementById('products-list');
+  list.innerHTML = '<div style="color:var(--steel);font-size:0.85rem;padding:1rem;"><i class="fa-solid fa-spinner fa-spin" style="margin-right:8px;"></i>載入中...</div>';
+  try {
+    var res = await fetch(SB_URL + '/rest/v1/products?order=created_at.asc', {
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    var data = await res.json();
+    if (!Array.isArray(data) || data.length === 0) {
+      list.innerHTML = '<div style="color:var(--steel);font-size:0.85rem;padding:1.5rem;text-align:center;"><i class="fa-solid fa-box-open" style="font-size:2rem;display:block;margin-bottom:0.75rem;opacity:0.4;"></i>尚無產品，點「新增產品」開始新增</div>';
+      return;
+    }
+    list.innerHTML = '';
+    data.forEach(function(p) { list.appendChild(renderProductItem(p)); });
+  } catch(e) {
+    list.innerHTML = '<div style="color:var(--danger);font-size:0.85rem;padding:1rem;"><i class="fa-solid fa-circle-exclamation" style="margin-right:8px;"></i>載入失敗，請確認 Supabase 設定</div>';
+  }
+}
+
+// 渲染單一產品列表項目
+function renderProductItem(p) {
+  var statusBadge = p.status === 'active'
+    ? '<span class="badge badge-active" style="margin-left:8px;">上架中</span>'
+    : '<span class="badge badge-draft" style="margin-left:8px;">草稿</span>';
+  var imgHtml = p.image_url
+    ? '<img src="' + p.image_url + '" style="width:52px;height:52px;object-fit:cover;border-radius:8px;border:1px solid rgba(0,200,255,0.2);flex-shrink:0;" />'
+    : '<div class="product-dot" style="background:#00c8ff;margin-top:4px;"></div>';
+  var item = document.createElement('div');
+  item.className = 'product-item';
+  item.setAttribute('data-id', p.id);
+  item.innerHTML = imgHtml +
+    '<div class="product-info">' +
+    '<div class="product-title">' + (p.name_tw || '') + '</div>' +
+    '<div class="product-meta">' + (p.spec || '') + statusBadge + '</div>' +
+    '</div>' +
+    '<div class="product-actions">' +
+    '<button class="btn btn-secondary btn-sm" onclick="editProductById(' + p.id + ')"><i class="fa-solid fa-pen"></i></button>' +
+    '<button class="btn btn-danger btn-sm" onclick="deleteProductById(' + p.id + ',this)"><i class="fa-solid fa-trash"></i></button>' +
+    '</div>';
+  return item;
+}
+
+// ======================== PRODUCT MODAL ========================
+var _editingProductId = null;
+
+function openProductModal(editIdx) {
+  _editingProductId = null;
+  document.getElementById('modal-title-text').textContent = '新增產品';
+  document.getElementById('m-name-tw').value = '';
+  document.getElementById('m-name-en').value = '';
+  document.getElementById('m-spec').value = '';
+  document.getElementById('m-desc').value = '';
+  document.getElementById('m-img-url').value = '';
+  document.getElementById('m-img-file').value = '';
+  document.getElementById('img-preview-wrap').style.display = 'none';
+  document.getElementById('img-placeholder').style.display = 'block';
+  document.getElementById('img-upload-status').style.display = 'none';
+  document.getElementById('product-modal').classList.add('open');
+}
+
+function closeProductModal() {
+  document.getElementById('product-modal').classList.remove('open');
+  _editingProductId = null;
+}
+
+async function editProductById(id) {
+  try {
+    var res = await fetch(SB_URL + '/rest/v1/products?id=eq.' + id, {
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    var data = await res.json();
+    if (!data || !data[0]) return;
+    var p = data[0];
+    _editingProductId = id;
+    document.getElementById('modal-title-text').textContent = '編輯產品';
+    document.getElementById('m-name-tw').value = p.name_tw || '';
+    document.getElementById('m-name-en').value = p.name_en || '';
+    document.getElementById('m-spec').value = p.spec || '';
+    document.getElementById('m-desc').value = p.description || '';
+    document.getElementById('m-cat').value = p.category || 'tft';
+    document.getElementById('m-status').value = p.status || 'active';
+    document.getElementById('m-img-url').value = p.image_url || '';
+    document.getElementById('img-upload-status').style.display = 'none';
+    if (p.image_url) {
+      document.getElementById('img-preview').src = p.image_url;
+      document.getElementById('img-preview-wrap').style.display = 'block';
+      document.getElementById('img-placeholder').style.display = 'none';
+    } else {
+      document.getElementById('img-preview-wrap').style.display = 'none';
+      document.getElementById('img-placeholder').style.display = 'block';
+    }
+    document.getElementById('product-modal').classList.add('open');
+  } catch(e) { showToast('載入產品資料失敗', true); }
+}
+
+async function deleteProductById(id, btn) {
+  if (!confirm('確定要刪除此產品嗎？')) return;
+  try {
+    await fetch(SB_URL + '/rest/v1/products?id=eq.' + id, {
+      method: 'DELETE',
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    var item = btn.closest('.product-item');
+    if (item) item.remove();
+    showToast('產品已刪除');
+  } catch(e) { showToast('刪除失敗', true); }
+}
+
+async function saveProduct() {
+  var name = document.getElementById('m-name-tw').value.trim();
+  if (!name) { showToast('請填寫產品名稱！', true); return; }
+
+  var btn = document.getElementById('save-product-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right:6px;"></i>儲存中...';
+
+  // 上傳圖片
+  var file = document.getElementById('m-img-file').files[0];
+  var imgUrl = document.getElementById('m-img-url').value;
+  if (file) { imgUrl = await uploadImageToSupabase(file) || imgUrl; }
+
+  var payload = {
+    name_tw: name,
+    name_en: document.getElementById('m-name-en').value.trim(),
+    spec: document.getElementById('m-spec').value.trim(),
+    category: document.getElementById('m-cat').value,
+    description: document.getElementById('m-desc').value.trim(),
+    image_url: imgUrl,
+    status: document.getElementById('m-status').value
+  };
+
+  try {
+    var method = _editingProductId ? 'PATCH' : 'POST';
+    var url = SB_URL + '/rest/v1/products' + (_editingProductId ? '?id=eq.' + _editingProductId : '');
+    var res = await fetch(url, {
+      method: method,
+      headers: {
+        'apikey': SB_KEY,
+        'Authorization': 'Bearer ' + SB_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(await res.text());
+    closeProductModal();
+    showToast(_editingProductId ? '產品已更新！' : '產品已新增！');
+    loadProducts(); // 重新載入列表
+  } catch(e) {
+    showToast('儲存失敗：' + e.message, true);
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<i class="fa-solid fa-floppy-disk" style="margin-right:6px;"></i>儲存產品';
+}
+
+function editProduct(idx) {
+  openProductModal(idx);
+  document.getElementById('modal-title-text').textContent = '編輯產品';
+}
+function deleteProduct(idx) {
+  if (confirm('確定要刪除此產品嗎？')) {
+    var items = document.querySelectorAll('.product-item');
+    if (items[idx]) items[idx].remove();
+    showToast('產品已刪除');
+  }
+}
+
+// ======================== SUPABASE ========================
+function testSupabase() {
+  var url = document.getElementById('sb-url').value;
+  var key = document.getElementById('sb-key').value;
+  var status = document.getElementById('sb-status');
+  if (!url || !key) { status.style.display='block'; status.innerHTML='<i class="fa-solid fa-circle-exclamation" style="color:var(--danger);margin-right:6px;"></i>請填寫 URL 和 Key'; return; }
+  status.style.display='block';
+  status.innerHTML='<i class="fa-solid fa-spinner fa-spin" style="color:var(--accent);margin-right:6px;"></i>測試連線中...';
+  fetch(url + '/rest/v1/', { headers: { 'apikey': key, 'Authorization': 'Bearer ' + key } })
+    .then(function(r){ status.innerHTML = r.ok ? '<i class="fa-solid fa-check" style="color:var(--success);margin-right:6px;"></i>連線成功！' : '<i class="fa-solid fa-xmark" style="color:var(--danger);margin-right:6px;"></i>連線失敗，請確認 URL 與 Key'; })
+    .catch(function(){ status.innerHTML='<i class="fa-solid fa-xmark" style="color:var(--danger);margin-right:6px;"></i>連線失敗，請確認 URL 與 Key'; });
+}
+function saveSupabase() {
+  localStorage.setItem('zhie_sb_url', document.getElementById('sb-url').value);
+  localStorage.setItem('zhie_sb_key', document.getElementById('sb-key').value);
+  showToast('Supabase 設定已儲存！');
+}
+
+// ======================== TOAST ========================
+function showToast(msg, isError) {
+  var t = document.getElementById('toast');
+  var m = document.getElementById('toast-msg');
+  m.textContent = msg;
+  t.className = isError ? 'error show' : 'show';
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(function(){ t.className = isError ? 'error' : ''; }, 2800);
+}
+</script>
+</body>
+</html>

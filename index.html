@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="致一科技 ZHIE CO.,LTD. - 專業LCD Module與電容式觸控屏設計開發"/>
+<title>致一科技 — 版本1 原版Logo風格</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Sans+SC:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --navy: #050d1a;
+    --navy2: #0a1628;
+    --navy3: #0f2040;
+    --accent: #1a7ac8;
+    --accent2: #0055aa;
+    --accent-dim: rgba(26,122,200,0.12);
+    --steel: #8ba4c0;
+    --white: #e8f0f8;
+    --card-bg: rgba(15,32,64,0.7);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans JP', sans-serif;
+    overflow-x: hidden;
+  }
+  body.lang-en { font-family: 'Syne', 'Noto Sans TC', sans-serif; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--navy); }
+  ::-webkit-scrollbar-thumb { background: var(--accent2); border-radius: 2px; }
+
+  /* CANVAS BG */
+  #bg-canvas { position: fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; opacity:0.35; }
+
+  /* LAYOUT */
+  .site-wrapper { position: relative; z-index: 1; }
+
+  /* NAV */
+  #main-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(5,13,26,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(0,200,255,0.08);
+    transition: all 0.3s;
+  }
+  #main-nav.scrolled { background: rgba(5,13,26,0.97); box-shadow: 0 4px 30px rgba(0,0,0,0.5); }
+  .nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; height: 80px; }
+
+  /* LOGO */
+  .logo-mark {
+    display: flex; align-items: center; gap: 10px; text-decoration: none; cursor: pointer;
+  }
+  .logo-icon { width: 54px; height: 54px; flex-shrink: 0; }
+  .logo-text-main { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.6rem; color: #fff; letter-spacing: 0.04em; line-height: 1; }
+  .logo-text-sub { font-family: 'Syne', sans-serif; font-weight: 400; font-size: 0.65rem; color: var(--accent); letter-spacing: 0.18em; line-height: 1; margin-top: 2px; }
+
+  /* NAV LINKS */
+  .nav-links { display: flex; align-items: center; gap: 0.5rem; }
+  .nav-links a, .nav-links button {
+    background: none; border: none; cursor: pointer;
+    color: var(--steel); font-size: 0.82rem; font-weight: 500; letter-spacing: 0.05em;
+    padding: 0.4rem 0.75rem; border-radius: 6px;
+    transition: color 0.2s, background 0.2s;
+    text-decoration: none; white-space: nowrap;
+  }
+  .nav-links a:hover, .nav-links button:hover { color: var(--accent); background: var(--accent-dim); }
+  .nav-links a.active { color: var(--accent); }
+
+  /* LANG DROPDOWN */
+  .lang-btn { display: flex; align-items: center; gap: 5px; padding: 0.4rem 0.75rem !important; border: 1px solid rgba(0,200,255,0.2) !important; border-radius: 6px !important; }
+  .lang-dropdown { position: absolute; top: 100%; right: 0; margin-top: 8px; background: var(--navy2); border: 1px solid rgba(0,200,255,0.15); border-radius: 10px; overflow: hidden; min-width: 140px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+  .lang-dropdown button { display: block; width: 100%; text-align: left; padding: 0.65rem 1rem; font-size: 0.9rem; color: var(--steel); transition: all 0.15s; border: none; background: none; cursor: pointer; }
+  .lang-dropdown button:hover { background: var(--accent-dim); color: var(--accent); }
+  .lang-dropdown button.active { color: var(--accent); }
+  .lang-relative { position: relative; }
+
+  /* MOBILE MENU */
+  #mobile-menu { display: none; }
+  #mobile-menu.open { display: block; }
+  .hamburger { display: none !important; }
+  @media(max-width:900px){
+    .hamburger { display: flex !important; flex-direction:column; gap:5px; cursor:pointer; padding:8px; background:none; border:none; }
+    .hamburger span { display:block; width:22px; height:2px; background:var(--steel); transition:0.3s; border-radius:2px; }
+    .nav-desktop { display: none !important; }
+    #mobile-menu { position:fixed; top:80px; left:0; right:0; background:rgba(5,13,26,0.97); backdrop-filter:blur(20px); padding:1rem 1.5rem 1.5rem; border-bottom:1px solid rgba(0,200,255,0.1); z-index:99; }
+    #mobile-menu a, #mobile-menu button { display:block; width:100%; text-align:left; padding:0.75rem 0; border-bottom:1px solid rgba(255,255,255,0.05); color:var(--steel); font-size:1.05rem; text-decoration:none; background:none; border-top:none; border-left:none; border-right:none; cursor:pointer; }
+    #mobile-menu .lang-options { display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.5rem; }
+    #mobile-menu .lang-options button { display:inline-block; width:auto; padding:0.35rem 0.75rem; border:1px solid rgba(0,200,255,0.2); border-radius:20px; font-size:0.75rem; }
+  }
+
+  /* SECTIONS */
+  .page-section { display: none; }
+  .page-section.active { display: block; }
+
+  /* HERO */
+  .hero { min-height: 100vh; display: flex; align-items: center; padding: 7rem 1.5rem 4rem; }
+  .hero-inner { max-width: 1280px; margin: 0 auto; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+  @media(max-width:900px){ .hero-inner { grid-template-columns:1fr; gap:3rem; } }
+  .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--accent-dim); border: 1px solid rgba(0,200,255,0.2); color: var(--accent); font-size: 0.72rem; letter-spacing: 0.15em; padding: 0.35rem 1rem; border-radius: 20px; margin-bottom: 1.5rem; text-transform: uppercase; }
+  .hero-tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.4)} }
+  .hero-title { font-family: 'Syne', sans-serif; font-size: clamp(2.2rem, 5vw, 3.8rem); font-weight: 800; line-height: 1.1; color: #fff; margin-bottom: 1.5rem; }
+  .hero-title .accent { color: var(--accent); }
+  .hero-desc { color: var(--steel); line-height: 1.8; font-size: 1.05rem; max-width: 480px; margin-bottom: 2.5rem; }
+  .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .btn-primary { background: var(--accent); color: var(--navy); font-weight: 700; font-size: 0.85rem; letter-spacing: 0.06em; padding: 0.8rem 2rem; border-radius: 8px; border: none; cursor: pointer; transition: all 0.2s; text-transform: uppercase; }
+  .btn-primary:hover { background: #33d4ff; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,200,255,0.3); }
+  .btn-secondary { background: transparent; color: var(--accent); font-weight: 600; font-size: 0.85rem; letter-spacing: 0.06em; padding: 0.8rem 2rem; border-radius: 8px; border: 1px solid rgba(0,200,255,0.3); cursor: pointer; transition: all 0.2s; text-transform: uppercase; }
+  .btn-secondary:hover { background: var(--accent-dim); transform: translateY(-2px); }
+
+  /* DISPLAY VISUAL */
+  .display-visual { position: relative; }
+  .tft-frame { position: relative; width: 100%; max-width: 440px; margin: 0 auto; }
+
+  /* STATS */
+  .stats-bar { background: var(--navy2); border-top: 1px solid rgba(0,200,255,0.08); border-bottom: 1px solid rgba(0,200,255,0.08); }
+  .stats-inner { max-width: 1280px; margin: 0 auto; padding: 2.5rem 1.5rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+  @media(max-width:640px){ .stats-inner { grid-template-columns: repeat(2, 1fr); } }
+  .stat-item { text-align: center; padding: 1rem; }
+  .stat-num { font-family: 'Syne', sans-serif; font-size: 2.2rem; font-weight: 800; color: var(--accent); line-height: 1; }
+  .stat-label { color: var(--steel); font-size: 0.78rem; margin-top: 0.5rem; letter-spacing: 0.05em; }
+
+  /* SECTION TITLE */
+  .section-wrap { max-width: 1280px; margin: 0 auto; padding: 5rem 1.5rem; }
+  .section-tag { font-size: 0.78rem; letter-spacing: 0.18em; color: var(--accent); text-transform: uppercase; margin-bottom: 0.75rem; }
+  .section-title { font-family: 'Syne', sans-serif; font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 800; color: #fff; line-height: 1.2; margin-bottom: 1rem; }
+  .section-desc { color: var(--steel); line-height: 1.8; max-width: 600px; font-size: 1.0rem; }
+  .section-line { width: 48px; height: 3px; background: linear-gradient(90deg, var(--accent), transparent); border-radius: 2px; margin: 1.2rem 0 2.5rem; }
+
+  /* CARDS */
+  .card { background: var(--card-bg); border: 1px solid rgba(0,200,255,0.08); border-radius: 16px; padding: 2rem; transition: all 0.3s; backdrop-filter: blur(8px); }
+  .card:hover { border-color: rgba(0,200,255,0.25); transform: translateY(-4px); box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 0 1px rgba(0,200,255,0.1); }
+  .card-icon { width: 48px; height: 48px; background: var(--accent-dim); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem; color: var(--accent); font-size: 1.3rem; }
+  .card-title { font-weight: 700; font-size: 1.08rem; color: #fff; margin-bottom: 0.6rem; }
+  .card-desc { color: var(--steel); font-size: 0.95rem; line-height: 1.8; }
+
+  /* PRODUCT CARDS */
+  .product-card { background: var(--card-bg); border: 1px solid rgba(0,200,255,0.08); border-radius: 16px; overflow: hidden; transition: all 0.3s; cursor: pointer; }
+  .product-card:hover { border-color: rgba(0,200,255,0.3); transform: translateY(-4px); box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+  .product-screen { width: 100%; aspect-ratio: 16/10; background: #000; position: relative; overflow: hidden; }
+  .product-info { padding: 1.25rem 1.5rem; }
+  .product-name { font-weight: 700; font-size: 1.05rem; color: #fff; margin-bottom: 0.3rem; }
+  .product-spec { color: var(--steel); font-size: 0.9rem; line-height: 1.7; }
+  .product-badge { display: inline-block; font-size: 0.68rem; letter-spacing: 0.08em; padding: 0.2rem 0.6rem; border-radius: 20px; margin-right: 0.3rem; margin-top: 0.5rem; text-transform: uppercase; }
+  .badge-mono { background: rgba(100,130,180,0.15); color: #8ba4c0; border: 1px solid rgba(100,130,180,0.2); }
+  .badge-tft { background: rgba(0,200,255,0.1); color: var(--accent); border: 1px solid rgba(0,200,255,0.2); }
+  .badge-touch { background: rgba(100,200,100,0.1); color: #6ec97a; border: 1px solid rgba(100,200,100,0.2); }
+  .badge-custom { background: rgba(255,160,0,0.1); color: #ffb347; border: 1px solid rgba(255,160,0,0.2); }
+
+  /* SOLUTION CARDS */
+  .solution-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; }
+  .sol-card { background: var(--card-bg); border: 1px solid rgba(0,200,255,0.08); border-radius: 14px; padding: 1.75rem; transition: all 0.3s; }
+  .sol-card:hover { border-color: rgba(0,200,255,0.2); background: rgba(15,32,64,0.9); }
+  .sol-icon { font-size: 1.8rem; margin-bottom: 1rem; }
+  .sol-title { font-weight: 700; font-size: 1.05rem; color: #fff; margin-bottom: 0.5rem; }
+  .sol-desc { color: var(--steel); font-size: 0.92rem; line-height: 1.8; }
+
+  /* ABOUT */
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+  @media(max-width:768px){ .about-grid { grid-template-columns: 1fr; gap: 2.5rem; } }
+  .value-item { display: flex; gap: 1rem; margin-bottom: 1.75rem; }
+  .value-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 5px; }
+  .value-label { font-weight: 700; font-size: 1.0rem; color: #fff; }
+  .value-desc { color: var(--steel); font-size: 0.93rem; line-height: 1.8; margin-top: 0.2rem; }
+  .timeline-item { position: relative; padding-left: 2rem; padding-bottom: 2rem; }
+  .timeline-item::before { content:''; position:absolute; left:0; top:6px; width:10px; height:10px; border-radius:50%; background:var(--accent); }
+  .timeline-item::after { content:''; position:absolute; left:4px; top:16px; width:2px; height:calc(100% - 16px); background:rgba(0,200,255,0.15); }
+  .timeline-item:last-child::after { display:none; }
+  .timeline-year { font-family:'Syne',sans-serif; font-size:0.72rem; letter-spacing:0.12em; color:var(--accent); margin-bottom:0.3rem; }
+  .timeline-text { color:var(--steel); font-size:0.85rem; line-height:1.7; }
+
+  /* CONTACT */
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+  @media(max-width:768px){ .contact-grid { grid-template-columns: 1fr; } }
+  .contact-item { display: flex; gap: 1rem; align-items: flex-start; padding: 1.25rem; background: var(--card-bg); border: 1px solid rgba(0,200,255,0.08); border-radius: 12px; }
+  .contact-icon { width: 40px; height: 40px; background: var(--accent-dim); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--accent); flex-shrink: 0; font-size: 1rem; }
+  .contact-label { font-size: 0.78rem; color: var(--steel); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.25rem; }
+  .contact-value { color: #fff; font-size: 1.0rem; font-weight: 500; }
+  .contact-value a { color: var(--accent); text-decoration: none; }
+  .contact-value a:hover { text-decoration: underline; }
+  .map-frame { border-radius: 16px; overflow: hidden; border: 1px solid rgba(0,200,255,0.1); height: 320px; background: var(--navy2); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 1rem; }
+  .contact-form input, .contact-form textarea {
+    width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(0,200,255,0.12);
+    border-radius: 8px; padding: 0.75rem 1rem; color: #fff; font-size: 0.88rem;
+    font-family: inherit; transition: border-color 0.2s; outline: none; resize: vertical;
+  }
+  .contact-form input:focus, .contact-form textarea:focus { border-color: rgba(0,200,255,0.4); background: rgba(0,200,255,0.04); }
+  .contact-form input::placeholder, .contact-form textarea::placeholder { color: var(--steel); }
+  .contact-form label { font-size: 0.78rem; color: var(--steel); letter-spacing: 0.06em; display: block; margin-bottom: 0.4rem; }
+  .form-sent { display:none; text-align:center; padding:2rem; color:var(--accent); }
+
+  /* FOOTER */
+  footer { background: var(--navy2); border-top: 1px solid rgba(0,200,255,0.08); padding: 3rem 1.5rem 2rem; }
+  .footer-inner { max-width: 1280px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 2rem; justify-content: space-between; align-items: flex-start; }
+  .footer-copy { color: var(--steel); font-size: 0.78rem; margin-top: 2rem; max-width: 1280px; margin-left: auto; margin-right: auto; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); }
+
+  /* ANIMATION */
+  .fade-in { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .fade-in.visible { opacity: 1; transform: none; }
+
+  /* GRID HELPERS */
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+  @media(max-width:900px){ .grid-4 { grid-template-columns: repeat(2,1fr); } .grid-3 { grid-template-columns: repeat(2,1fr); } }
+  @media(max-width:560px){ .grid-4,.grid-3,.grid-2 { grid-template-columns: 1fr; } }
+
+  /* SUB PAGE */
+  .sub-hero { padding: 8rem 1.5rem 3rem; text-align: center; }
+  .sub-hero-inner { max-width: 800px; margin: 0 auto; }
+  .breadcrumb { font-size: 0.78rem; color: var(--steel); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; justify-content: center; }
+  .breadcrumb span { color: var(--accent); }
+  .back-btn { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--steel); cursor: pointer; transition: color 0.2s; background: none; border: none; padding: 0; margin-bottom: 2rem; }
+  .back-btn:hover { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- NAV -->
+<nav id="main-nav">
+  <div class="nav-inner">
+    <div class="logo-mark" onclick="showSection('home')">
+      <img src="./logo.png" alt="ZHIE Technology" style="height:54px;width:auto;object-fit:contain;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.3));"/>
+      <div>
+        <div class="logo-text-sub" style="margin-top:0;">TECHNOLOGY</div>
+      </div>
+    </div>
+
+    <div class="nav-links nav-desktop" style="display:flex;align-items:center;gap:0.25rem;">
+      <a href="#" onclick="showSection('about');return false;" id="nav-about" class="nav-link" data-i18n="nav_about">關於我們</a>
+      <a href="#" onclick="showSection('products');return false;" id="nav-products" class="nav-link" data-i18n="nav_products">產品</a>
+      <a href="#" onclick="showSection('solutions');return false;" id="nav-solutions" class="nav-link" data-i18n="nav_solutions">解決方案</a>
+      <a href="#" onclick="showSection('contact');return false;" id="nav-contact" class="nav-link" data-i18n="nav_contact">聯繫我們</a>
+      <div class="lang-relative ml-3">
+        <button class="lang-btn nav-links" onclick="toggleLangMenu()" id="lang-toggle-btn">
+          <i class="fa-solid fa-globe" style="font-size:0.85rem"></i>
+          <span id="lang-current">繁中</span>
+          <i class="fa-solid fa-chevron-down" style="font-size:0.65rem"></i>
+        </button>
+        <div class="lang-dropdown" id="lang-dropdown" style="display:none">
+          <button onclick="setLang('zh-TW')">繁體中文</button>
+          <button onclick="setLang('zh-CN')">简体中文</button>
+          <button onclick="setLang('en')">English</button>
+          <button onclick="setLang('ja')">日本語</button>
+        </div>
+      </div>
+    </div>
+
+    <button class="hamburger" onclick="toggleMobileMenu()" aria-label="選單">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu">
+    <a href="#" onclick="showSection('about');toggleMobileMenu();return false;" data-i18n="nav_about">關於我們</a>
+    <a href="#" onclick="showSection('products');toggleMobileMenu();return false;" data-i18n="nav_products">產品</a>
+    <a href="#" onclick="showSection('solutions');toggleMobileMenu();return false;" data-i18n="nav_solutions">解決方案</a>
+    <a href="#" onclick="showSection('contact');toggleMobileMenu();return false;" data-i18n="nav_contact">聯繫我們</a>
+    <div style="padding:0.75rem 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+      <div style="font-size:0.72rem;color:var(--steel);letter-spacing:0.1em;margin-bottom:0.6rem;">LANGUAGE</div>
+      <div class="lang-options">
+        <button onclick="setLang('zh-TW');toggleMobileMenu()">繁體中文</button>
+        <button onclick="setLang('zh-CN');toggleMobileMenu()">简体中文</button>
+        <button onclick="setLang('en');toggleMobileMenu()">English</button>
+        <button onclick="setLang('ja');toggleMobileMenu()">日本語</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="site-wrapper">
+
+<!-- ======================== HOME ======================== -->
+<section id="sec-home" class="page-section active">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-tag" data-i18n="hero_tag">Since 2017 · LCD Module Expert</div>
+        <h1 class="hero-title">
+          <span data-i18n="hero_title1">專業顯示模組</span><br>
+          <span class="accent" data-i18n="hero_title2">研發設計夥伴</span>
+        </h1>
+        <p class="hero-desc" data-i18n="hero_desc">
+          致一科技專注於 Mono LCM 及 TFT 彩色顯示模組的研發與客製化設計，擁有超過 15 年光電產業經驗，為全球工業、醫療、車載等領域提供高品質顯示解決方案。
+        </p>
+        <div class="hero-btns">
+          <button class="btn-primary" onclick="showSection('products')" data-i18n="hero_btn1">探索產品</button>
+          <button class="btn-secondary" onclick="showSection('contact')" data-i18n="hero_btn2">聯繫我們</button>
+        </div>
+      </div>
+      <div class="display-visual">
+        <!-- TFT Display SVG -->
+        <div class="tft-frame">
+          <svg viewBox="0 0 440 340" xmlns="http://www.w3.org/2000/svg" style="width:100%;filter:drop-shadow(0 20px 60px rgba(0,200,255,0.2))">
+            <!-- Monitor stand -->
+            <rect x="185" y="305" width="70" height="8" rx="4" fill="#1a2a3f"/>
+            <rect x="205" y="285" width="30" height="22" rx="4" fill="#1a2a3f"/>
+            <!-- Monitor bezel -->
+            <rect x="20" y="20" width="400" height="268" rx="14" fill="#0a1628" stroke="#00c8ff" stroke-width="1" stroke-opacity="0.4"/>
+            <!-- Screen area -->
+            <rect x="32" y="30" width="376" height="248" rx="8" fill="#000d1a"/>
+            <!-- TFT display content - colorful UI simulation -->
+            <!-- Background gradient sim -->
+            <rect x="32" y="30" width="376" height="248" rx="8" fill="url(#screenGrad)"/>
+            <defs>
+              <linearGradient id="screenGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#00040e"/>
+                <stop offset="100%" stop-color="#001a2e"/>
+              </linearGradient>
+            </defs>
+            <!-- Colorful UI elements inside TFT -->
+            <!-- Header bar -->
+            <rect x="32" y="30" width="376" height="34" rx="4" fill="#001428"/>
+            <circle cx="52" cy="47" r="6" fill="#ff5f57"/>
+            <circle cx="70" cy="47" r="6" fill="#febc2e"/>
+            <circle cx="88" cy="47" r="6" fill="#28c840"/>
+            <text x="220" y="51" text-anchor="middle" font-size="10" fill="#00c8ff" font-family="monospace">ZHIE TFT DISPLAY MODULE — 7.0"</text>
+            <!-- Chart area -->
+            <rect x="44" y="74" width="168" height="110" rx="6" fill="rgba(0,200,255,0.06)" stroke="rgba(0,200,255,0.15)" stroke-width="0.5"/>
+            <text x="54" y="89" font-size="7" fill="#8ba4c0" font-family="monospace">WAVEFORM OUTPUT</text>
+            <!-- Wave line -->
+            <polyline points="50,150 65,130 75,155 85,110 100,150 115,125 130,155 145,108 160,148 175,130 190,150 205,132" stroke="#00c8ff" stroke-width="1.5" fill="none"/>
+            <polyline points="50,150 65,130 75,155 85,110 100,150 115,125 130,155 145,108 160,148 175,130 190,150 205,132" stroke="#00c8ff" stroke-width="8" fill="none" stroke-opacity="0.08"/>
+            <!-- Right panel charts -->
+            <rect x="224" y="74" width="176" height="110" rx="6" fill="rgba(0,120,255,0.06)" stroke="rgba(0,120,255,0.15)" stroke-width="0.5"/>
+            <text x="234" y="89" font-size="7" fill="#8ba4c0" font-family="monospace">PARAMETER STATUS</text>
+            <!-- Bars -->
+            <rect x="238" y="128" width="16" height="50" rx="2" fill="rgba(0,200,255,0.3)"/>
+            <rect x="260" y="118" width="16" height="60" rx="2" fill="#00c8ff"/>
+            <rect x="282" y="134" width="16" height="44" rx="2" fill="rgba(0,200,255,0.3)"/>
+            <rect x="304" y="110" width="16" height="68" rx="2" fill="#0077ff"/>
+            <rect x="326" y="126" width="16" height="52" rx="2" fill="rgba(0,200,255,0.3)"/>
+            <rect x="348" y="120" width="16" height="58" rx="2" fill="#00c8ff"/>
+            <rect x="370" y="138" width="16" height="40" rx="2" fill="rgba(0,200,255,0.3)"/>
+            <!-- Bottom row -->
+            <rect x="44" y="196" width="80" height="56" rx="6" fill="rgba(255,80,80,0.08)" stroke="rgba(255,80,80,0.2)" stroke-width="0.5"/>
+            <text x="84" y="220" text-anchor="middle" font-size="16" fill="#ff6060" font-family="monospace">24.7°C</text>
+            <text x="84" y="233" text-anchor="middle" font-size="7" fill="#8ba4c0" font-family="monospace">TEMPERATURE</text>
+            <rect x="134" y="196" width="80" height="56" rx="6" fill="rgba(80,255,120,0.08)" stroke="rgba(80,255,120,0.2)" stroke-width="0.5"/>
+            <text x="174" y="220" text-anchor="middle" font-size="16" fill="#50ff78" font-family="monospace">98.3%</text>
+            <text x="174" y="233" text-anchor="middle" font-size="7" fill="#8ba4c0" font-family="monospace">SIGNAL QUALITY</text>
+            <rect x="224" y="196" width="80" height="56" rx="6" fill="rgba(255,200,0,0.08)" stroke="rgba(255,200,0,0.2)" stroke-width="0.5"/>
+            <text x="264" y="220" text-anchor="middle" font-size="16" fill="#ffc800" font-family="monospace">5.0V</text>
+            <text x="264" y="233" text-anchor="middle" font-size="7" fill="#8ba4c0" font-family="monospace">VOLTAGE</text>
+            <rect x="314" y="196" width="86" height="56" rx="6" fill="rgba(0,200,255,0.08)" stroke="rgba(0,200,255,0.2)" stroke-width="0.5"/>
+            <text x="357" y="220" text-anchor="middle" font-size="16" fill="#00c8ff" font-family="monospace">1024×600</text>
+            <text x="357" y="233" text-anchor="middle" font-size="7" fill="#8ba4c0" font-family="monospace">RESOLUTION</text>
+            <!-- Bottom status bar -->
+            <rect x="32" y="258" width="376" height="20" rx="3" fill="#000d1a"/>
+            <circle cx="48" cy="268" r="4" fill="#28c840"/>
+            <text x="58" y="272" font-size="7" fill="#8ba4c0" font-family="monospace">DISPLAY ACTIVE</text>
+            <text x="370" y="272" text-anchor="end" font-size="7" fill="#00c8ff" font-family="monospace">ZHIE LCM v2.4</text>
+            <!-- Glow effect -->
+            <rect x="32" y="30" width="376" height="248" rx="8" fill="none" stroke="#00c8ff" stroke-width="1" stroke-opacity="0.2"/>
+            <!-- Power LED -->
+            <circle cx="406" cy="288" r="3" fill="#28c840" opacity="0.8">
+              <animate attributeName="opacity" values="0.8;0.3;0.8" dur="2s" repeatCount="indefinite"/>
+            </circle>
+          </svg>
+          <!-- Floating badges -->
+          <div style="position:absolute;top:-10px;right:-10px;background:rgba(0,200,255,0.1);border:1px solid rgba(0,200,255,0.3);border-radius:8px;padding:0.5rem 0.85rem;font-size:0.72rem;color:var(--accent);font-family:'Syne',sans-serif;font-weight:700;letter-spacing:0.1em;backdrop-filter:blur(8px);">TFT · MONO · TOUCH</div>
+          <div style="position:absolute;bottom:40px;left:-15px;background:rgba(5,13,26,0.9);border:1px solid rgba(0,200,255,0.15);border-radius:8px;padding:0.5rem 0.85rem;font-size:0.72rem;color:var(--steel);backdrop-filter:blur(8px);">
+            <span style="color:#28c840;margin-right:6px;">●</span><span data-i18n="hero_badge_custom">客製化設計</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stats-inner">
+      <div class="stat-item fade-in">
+        <div class="stat-num">2017</div>
+        <div class="stat-label" data-i18n="stat_founded">成立年份</div>
+      </div>
+      <div class="stat-item fade-in">
+        <div class="stat-num">15+</div>
+        <div class="stat-label" data-i18n="stat_exp">年產業經驗</div>
+      </div>
+      <div class="stat-item fade-in">
+        <div class="stat-num">100%</div>
+        <div class="stat-label" data-i18n="stat_custom">可客製化</div>
+      </div>
+      <div class="stat-item fade-in">
+        <div class="stat-num">5+</div>
+        <div class="stat-label" data-i18n="stat_sectors">應用領域</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAPABILITIES PREVIEW -->
+  <div class="section-wrap">
+    <p class="section-tag" data-i18n="cap_tag">Core Capabilities</p>
+    <h2 class="section-title" data-i18n="cap_title">研發驅動的顯示技術</h2>
+    <p class="section-desc" data-i18n="cap_desc">從 Mono LCM 控制介面到 TFT 彩色顯示模組，我們提供完整的硬體設計、韌體開發與生產支援。</p>
+    <div class="section-line"></div>
+    <div class="grid-3">
+      <div class="card fade-in">
+        <div class="card-icon"><i class="fa-solid fa-microchip"></i></div>
+        <div class="card-title" data-i18n="cap1_title">Mono LCM 控制介面開發</div>
+        <div class="card-desc" data-i18n="cap1_desc">深耕單色液晶顯示模組，提供從驅動 IC 選型、控制板設計到量產的完整解決方案。</div>
+      </div>
+      <div class="card fade-in">
+        <div class="card-icon"><i class="fa-solid fa-display"></i></div>
+        <div class="card-title" data-i18n="cap2_title">TFT 彩色顯示整合</div>
+        <div class="card-desc" data-i18n="cap2_desc">支援 RGB、MIPI、LVDS 等多種介面協定，搭配觸控整合，實現高質感人機介面。</div>
+      </div>
+      <div class="card fade-in">
+        <div class="card-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+        <div class="card-title" data-i18n="cap3_title">深度客製化設計服務</div>
+        <div class="card-desc" data-i18n="cap3_desc">從規格確認、電路設計、樣品打樣到量產交付，全程配合客戶技術需求，彈性快速響應。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTORS PREVIEW -->
+  <div style="background:var(--navy2);border-top:1px solid rgba(0,200,255,0.06);border-bottom:1px solid rgba(0,200,255,0.06);">
+    <div class="section-wrap">
+      <p class="section-tag" data-i18n="sector_tag">Application Sectors</p>
+      <h2 class="section-title" data-i18n="sector_title">多元產業應用</h2>
+      <div class="section-line"></div>
+      <div class="grid-4">
+        <div class="sol-card fade-in">
+          <div class="sol-icon">🏭</div>
+          <div class="sol-title" data-i18n="sol1">工業控制</div>
+          <div class="sol-desc" data-i18n="sol1_desc">HMI、工控面板、PLC 顯示介面，耐高溫寬溫設計。</div>
+        </div>
+        <div class="sol-card fade-in">
+          <div class="sol-icon">🏥</div>
+          <div class="sol-title" data-i18n="sol2">醫療儀器</div>
+          <div class="sol-desc" data-i18n="sol2_desc">符合醫療級別要求，高可靠性、低輻射干擾設計。</div>
+        </div>
+        <div class="sol-card fade-in">
+          <div class="sol-icon">🚗</div>
+          <div class="sol-title" data-i18n="sol3">車載顯示</div>
+          <div class="sol-desc" data-i18n="sol3_desc">寬溫車規設計，抗震動、防濕氣，符合 AEC-Q 規範。</div>
+        </div>
+        <div class="sol-card fade-in">
+          <div class="sol-icon">🏠</div>
+          <div class="sol-title" data-i18n="sol4">智慧家居</div>
+          <div class="sol-desc" data-i18n="sol4_desc">觸控面板、智慧控制器，低功耗設計，美觀易整合。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="section-wrap" style="text-align:center;padding:4rem 1.5rem;">
+    <p class="section-tag" style="justify-content:center;" data-i18n="cta_tag">Get In Touch</p>
+    <h2 class="section-title" style="max-width:600px;margin:0 auto 1rem;" data-i18n="cta_title">準備好開始您的顯示模組專案了嗎？</h2>
+    <p class="section-desc" style="margin:0 auto 2rem;" data-i18n="cta_desc">我們的工程師團隊隨時準備提供技術諮詢，從規格討論到客製化開發，一步到位。</p>
+    <button class="btn-primary" onclick="showSection('contact')" data-i18n="cta_btn">立即聯繫我們</button>
+  </div>
+
+</section>
+
+<!-- ======================== ABOUT ======================== -->
+<section id="sec-about" class="page-section">
+  <div class="sub-hero">
+    <div class="sub-hero-inner">
+      <div class="breadcrumb">
+        <button class="back-btn" onclick="showSection('home')"><i class="fa-solid fa-arrow-left"></i> <span data-i18n="back">返回首頁</span></button>
+      </div>
+      <p class="section-tag" data-i18n="about_tag">About ZHIE</p>
+      <h1 class="section-title" data-i18n="about_title">關於致一科技</h1>
+      <p class="section-desc" style="margin:0 auto;text-align:center;" data-i18n="about_sub">成立於 2017 年，專注顯示模組研發，以誠信與品質服務全球客戶</p>
+    </div>
+  </div>
+  <div class="section-wrap" style="padding-top:2rem;">
+    <div class="about-grid">
+      <div>
+        <p class="section-tag" data-i18n="about_story_tag">Our Story</p>
+        <h2 class="section-title" style="font-size:1.8rem;" data-i18n="about_story_title">由研發驅動的顯示專家</h2>
+        <div class="section-line"></div>
+        <p style="color:var(--steel);line-height:1.9;font-size:0.9rem;margin-bottom:1.25rem;" data-i18n="about_p1">致一科技由資深研發負責人於 2017 年創立，核心團隊成員均擁有超過 15 年以上的光電顯示產業資歷。公司以研發能力為核心競爭力，專精於 LCD Module 與電容式觸控屏的設計開發。</p>
+        <p style="color:var(--steel);line-height:1.9;font-size:0.9rem;margin-bottom:1.25rem;" data-i18n="about_p2">我們從事各類顯示產品，包括 Mono 黑白液晶顯示模組及 TFT 彩色顯示模組，涵蓋周邊電子電路設計，提供完整的客製化液晶顯示與觸控屏解決方案，滿足客戶特定的技術與設計需求。</p>
+        <p style="color:var(--steel);line-height:1.9;font-size:0.9rem;" data-i18n="about_p3">我們整合內外部資源，以客制化研發、彈性生產、即時交貨，提供「品質第一，顧客滿意」高附加價值的產品與優質服務。</p>
+        <!-- Timeline -->
+        <div style="margin-top:2.5rem;">
+          <p class="section-tag" data-i18n="about_timeline_tag">Milestones</p>
+          <div style="margin-top:1.25rem;">
+            <div class="timeline-item">
+              <div class="timeline-year">2017</div>
+              <div class="timeline-text" data-i18n="tl1">致一科技有限公司正式成立，專注 LCD Module 研發設計業務</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-year">2019</div>
+              <div class="timeline-text" data-i18n="tl2">拓展 TFT 彩色顯示模組產品線，導入觸控屏整合服務</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-year">2021</div>
+              <div class="timeline-text" data-i18n="tl3">深化工業、醫療、車載等高端應用市場客製化能力</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-year">2024</div>
+              <div class="timeline-text" data-i18n="tl4">持續強化 HMI 人機介面整合方案，服務全球客戶</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p class="section-tag" data-i18n="about_values_tag">Core Values</p>
+        <h2 class="section-title" style="font-size:1.8rem;" data-i18n="about_values_title">核心理念</h2>
+        <div class="section-line"></div>
+        <div class="value-item">
+          <div class="value-dot"></div>
+          <div>
+            <div class="value-label" data-i18n="val1">誠信 Integrity</div>
+            <div class="value-desc" data-i18n="val1_desc">誠信是我們與客戶、合作夥伴建立長期關係的基石，每一份承諾都落實到位。</div>
+          </div>
+        </div>
+        <div class="value-item">
+          <div class="value-dot"></div>
+          <div>
+            <div class="value-label" data-i18n="val2">服務 Service</div>
+            <div class="value-desc" data-i18n="val2_desc">以客戶需求為優先，快速響應技術問題，提供從設計到交付的全程支援。</div>
+          </div>
+        </div>
+        <div class="value-item">
+          <div class="value-dot"></div>
+          <div>
+            <div class="value-label" data-i18n="val3">品質 Quality</div>
+            <div class="value-desc" data-i18n="val3_desc">嚴格執行品質管控，「唯一」與「滿意」是我們品質政策的最高宗旨。</div>
+          </div>
+        </div>
+        <div class="value-item">
+          <div class="value-dot"></div>
+          <div>
+            <div class="value-label" data-i18n="val4">負責 Responsibility</div>
+            <div class="value-desc" data-i18n="val4_desc">對每個專案負責到底，從規格確認到量產交付，全程承擔技術責任。</div>
+          </div>
+        </div>
+        <!-- Why choose us -->
+        <div class="card" style="margin-top:2rem;">
+          <p class="section-tag" style="margin-bottom:1rem;" data-i18n="why_tag">Why ZHIE</p>
+          <div style="display:flex;flex-direction:column;gap:0.75rem;">
+            <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.85rem;color:var(--steel);">
+              <i class="fa-solid fa-check" style="color:var(--accent);flex-shrink:0;"></i>
+              <span data-i18n="why1">研發團隊主導，技術溝通直接高效</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.85rem;color:var(--steel);">
+              <i class="fa-solid fa-check" style="color:var(--accent);flex-shrink:0;"></i>
+              <span data-i18n="why2">Mono LCM 及 TFT 雙線產品能力</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.85rem;color:var(--steel);">
+              <i class="fa-solid fa-check" style="color:var(--accent);flex-shrink:0;"></i>
+              <span data-i18n="why3">小批量客製到大批量生產均可承接</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.85rem;color:var(--steel);">
+              <i class="fa-solid fa-check" style="color:var(--accent);flex-shrink:0;"></i>
+              <span data-i18n="why4">15 年以上專業人員，技術資歷深厚</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================== PRODUCTS ======================== -->
+<section id="sec-products" class="page-section">
+  <div class="sub-hero">
+    <div class="sub-hero-inner">
+      <div class="breadcrumb">
+        <button class="back-btn" onclick="showSection('home')"><i class="fa-solid fa-arrow-left"></i> <span data-i18n="back">返回首頁</span></button>
+      </div>
+      <p class="section-tag" data-i18n="prod_tag">Product Lineup</p>
+      <h1 class="section-title" data-i18n="prod_title">顯示模組產品</h1>
+      <p class="section-desc" style="margin:0 auto;text-align:center;" data-i18n="prod_sub">標準品與客製化產品並行，涵蓋 Mono LCM、TFT 彩色顯示及觸控整合方案</p>
+    </div>
+  </div>
+  <div class="section-wrap" style="padding-top:1rem;">
+    <!-- Filter tabs -->
+    <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:2.5rem;" id="prod-filters">
+      <button class="btn-primary" onclick="filterProducts('all',this)" data-i18n="filter_all" style="font-size:0.78rem;padding:0.5rem 1.25rem;">全部</button>
+      <button class="btn-secondary" onclick="filterProducts('mono',this)" data-i18n="filter_mono" style="font-size:0.78rem;padding:0.5rem 1.25rem;">Mono LCM</button>
+      <button class="btn-secondary" onclick="filterProducts('tft',this)" data-i18n="filter_tft" style="font-size:0.78rem;padding:0.5rem 1.25rem;">TFT 彩色</button>
+      <button class="btn-secondary" onclick="filterProducts('touch',this)" data-i18n="filter_touch" style="font-size:0.78rem;padding:0.5rem 1.25rem;">觸控模組</button>
+      <button class="btn-secondary" onclick="filterProducts('custom',this)" data-i18n="filter_custom" style="font-size:0.78rem;padding:0.5rem 1.25rem;">客製化</button>
+    </div>
+    <div class="grid-3" id="products-grid">
+      <div style="grid-column:1/-1;text-align:center;padding:3rem 0;color:var(--steel);">
+        <i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem;margin-bottom:1rem;display:block;color:var(--accent);"></i>
+        載入產品中...
+      </div>
+    </div>
+
+        </div>
+
+    <!-- Custom CTA -->
+    <div class="card" style="margin-top:3rem;text-align:center;padding:2.5rem;">
+      <i class="fa-solid fa-pen-ruler" style="font-size:2rem;color:var(--accent);margin-bottom:1rem;display:block;"></i>
+      <h3 style="font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:0.5rem;" data-i18n="prod_cta_title">找不到符合需求的規格？</h3>
+      <p style="color:var(--steel);font-size:0.85rem;margin-bottom:1.5rem;" data-i18n="prod_cta_desc">致一科技提供完整客製化設計服務，歡迎提供您的技術規格，我們將評估並回覆報價。</p>
+      <button class="btn-primary" onclick="showSection('contact')" data-i18n="prod_cta_btn">詢問客製化方案</button>
+    </div>
+  </div>
+</section>
+
+<!-- ======================== SOLUTIONS ======================== -->
+<section id="sec-solutions" class="page-section">
+  <div class="sub-hero">
+    <div class="sub-hero-inner">
+      <div class="breadcrumb">
+        <button class="back-btn" onclick="showSection('home')"><i class="fa-solid fa-arrow-left"></i> <span data-i18n="back">返回首頁</span></button>
+      </div>
+      <p class="section-tag" data-i18n="sol_tag">Solutions</p>
+      <h1 class="section-title" data-i18n="sol_title">行業解決方案</h1>
+      <p class="section-desc" style="margin:0 auto;text-align:center;" data-i18n="sol_sub">針對不同應用場景，提供專業顯示模組整合方案</p>
+    </div>
+  </div>
+  <div class="section-wrap" style="padding-top:1rem;">
+    <div style="display:grid;grid-template-columns:1fr;gap:2rem;">
+
+      <div class="card" style="display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start;">
+        <div style="font-size:3rem;padding-top:0.25rem;">🏭</div>
+        <div>
+          <h3 style="font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:0.5rem;" data-i18n="sol1_h">工業控制 Industrial Control</h3>
+          <p style="color:var(--steel);font-size:0.87rem;line-height:1.8;margin-bottom:1rem;" data-i18n="sol1_full">提供工控 HMI 面板、PLC 控制器顯示介面、工業儀表等應用的顯示模組解決方案。支援寬溫（-40°C～85°C）設計，抗電磁干擾，符合工業級可靠性要求。</p>
+          <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+            <span class="product-badge badge-mono">HMI 面板</span>
+            <span class="product-badge badge-tft">工業儀表</span>
+            <span class="product-badge badge-custom">PLC 顯示器</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start;">
+        <div style="font-size:3rem;padding-top:0.25rem;">🏥</div>
+        <div>
+          <h3 style="font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:0.5rem;" data-i18n="sol2_h">醫療儀器 Medical Equipment</h3>
+          <p style="color:var(--steel);font-size:0.87rem;line-height:1.8;margin-bottom:1rem;" data-i18n="sol2_full">針對醫療器材顯示需求，提供高可靠性、低電磁輻射、高對比度顯示模組。符合醫療設備對顯示清晰度及穩定性的嚴格要求，支援特殊尺寸定制。</p>
+          <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+            <span class="product-badge badge-tft">醫療顯示器</span>
+            <span class="product-badge badge-custom">生命體征監測</span>
+            <span class="product-badge badge-mono">可攜式設備</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start;">
+        <div style="font-size:3rem;padding-top:0.25rem;">🚗</div>
+        <div>
+          <h3 style="font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:0.5rem;" data-i18n="sol3_h">車載顯示 Automotive Display</h3>
+          <p style="color:var(--steel);font-size:0.87rem;line-height:1.8;margin-bottom:1rem;" data-i18n="sol3_full">車載顯示模組需通過嚴格的環境測試，我們提供符合車規寬溫設計，抗震動、防濕氣、高亮度（可達 1000nit+）顯示模組，適用儀表板、後座娛樂、導航系統。</p>
+          <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+            <span class="product-badge badge-tft">儀表板顯示</span>
+            <span class="product-badge badge-custom">車載娛樂</span>
+            <span class="product-badge badge-touch">觸控導航</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start;">
+        <div style="font-size:3rem;padding-top:0.25rem;">🏠</div>
+        <div>
+          <h3 style="font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:0.5rem;" data-i18n="sol4_h">智慧家居 Smart Home</h3>
+          <p style="color:var(--steel);font-size:0.87rem;line-height:1.8;margin-bottom:1rem;" data-i18n="sol4_full">為智慧家居控制面板、環境感測器顯示介面提供美觀、低功耗的觸控顯示模組。支援超薄邊框設計，色彩還原精準，觸控靈敏，易於整合至各類智慧家居產品。</p>
+          <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+            <span class="product-badge badge-tft">智慧面板</span>
+            <span class="product-badge badge-touch">觸控螢幕</span>
+            <span class="product-badge badge-custom">環境感測顯示</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start;">
+        <div style="font-size:3rem;padding-top:0.25rem;">📱</div>
+        <div>
+          <h3 style="font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:0.5rem;" data-i18n="sol5_h">消費性電子 Consumer Electronics</h3>
+          <p style="color:var(--steel);font-size:0.87rem;line-height:1.8;margin-bottom:1rem;" data-i18n="sol5_full">為穿戴式裝置、手持測量儀器、電子標籤等消費性產品提供輕薄、省電、高性能的顯示模組方案，支援快速打樣及彈性量產，協助客戶快速進入市場。</p>
+          <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+            <span class="product-badge badge-mono">穿戴裝置</span>
+            <span class="product-badge badge-tft">手持儀器</span>
+            <span class="product-badge badge-custom">電子標籤</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ======================== CONTACT ======================== -->
+<section id="sec-contact" class="page-section">
+  <div class="sub-hero">
+    <div class="sub-hero-inner">
+      <div class="breadcrumb">
+        <button class="back-btn" onclick="showSection('home')"><i class="fa-solid fa-arrow-left"></i> <span data-i18n="back">返回首頁</span></button>
+      </div>
+      <p class="section-tag" data-i18n="contact_tag">Get In Touch</p>
+      <h1 class="section-title" data-i18n="contact_title">聯繫致一科技</h1>
+      <p class="section-desc" style="margin:0 auto;text-align:center;" data-i18n="contact_sub">歡迎洽詢產品規格、客製化需求或技術合作</p>
+    </div>
+  </div>
+  <div class="section-wrap" style="padding-top:1rem;">
+    <div class="contact-grid">
+      <div>
+        <p class="section-tag" data-i18n="contact_info_tag">Contact Info</p>
+        <h2 class="section-title" style="font-size:1.6rem;" data-i18n="contact_info_title">聯絡資訊</h2>
+        <div class="section-line"></div>
+        <div style="display:flex;flex-direction:column;gap:1rem;margin-bottom:2rem;">
+          <div class="contact-item">
+            <div class="contact-icon"><i class="fa-solid fa-phone"></i></div>
+            <div>
+              <div class="contact-label" data-i18n="c_phone_label">電話</div>
+              <div class="contact-value"><a href="tel:0227718076">02-2771-8076</a></div>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon"><i class="fa-solid fa-envelope"></i></div>
+            <div>
+              <div class="contact-label" data-i18n="c_email_label">電子信箱</div>
+              <div class="contact-value"><a href="mailto:zhie@zhietech.com">zhie@zhietech.com</a></div>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon"><i class="fa-solid fa-location-dot"></i></div>
+            <div>
+              <div class="contact-label" data-i18n="c_addr_label">公司地址</div>
+              <div class="contact-value"><a href="https://maps.google.com.tw/maps?hl=zh-TW&q=221+新北市汐止區福德一路405巷5號&z=18" target="_blank" rel="noopener">221 新北市汐止區<br>福德一路405巷5號</a></div>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon"><i class="fa-solid fa-clock"></i></div>
+            <div>
+              <div class="contact-label" data-i18n="c_hours_label">營業時間</div>
+              <div class="contact-value" data-i18n="c_hours_val">週一至週五 09:00–18:00</div>
+            </div>
+          </div>
+        </div>
+        <!-- Map link -->
+        <a href="https://maps.google.com.tw/maps?hl=zh-TW&q=221+新北市汐止區福德一路405巷5號&z=18" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:0.75rem;width:100%;padding:1rem;background:var(--accent-dim);border:1px solid rgba(0,200,255,0.2);border-radius:12px;color:var(--accent);font-size:0.85rem;font-weight:600;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(0,200,255,0.15)'" onmouseout="this.style.background='var(--accent-dim)'">
+          <i class="fa-solid fa-map-location-dot"></i>
+          <span data-i18n="c_map_btn">在 Google Maps 中查看</span>
+          <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.75rem;"></i>
+        </a>
+      </div>
+      <!-- Contact Form -->
+      <div>
+        <p class="section-tag" data-i18n="contact_form_tag">Send Message</p>
+        <h2 class="section-title" style="font-size:1.6rem;" data-i18n="contact_form_title">發送詢問</h2>
+        <div class="section-line"></div>
+        <div class="contact-form" id="contact-form">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+            <div>
+              <label data-i18n="f_name">姓名 *</label>
+              <input type="text" id="f-name" data-i18n-placeholder="f_name_ph" placeholder="您的姓名"/>
+            </div>
+            <div>
+              <label data-i18n="f_company">公司名稱</label>
+              <input type="text" id="f-company" data-i18n-placeholder="f_company_ph" placeholder="公司名稱（選填）"/>
+            </div>
+          </div>
+          <div style="margin-bottom:1rem;">
+            <label data-i18n="f_email">電子信箱 *</label>
+            <input type="email" id="f-email" data-i18n-placeholder="f_email_ph" placeholder="your@email.com"/>
+          </div>
+          <div style="margin-bottom:1rem;">
+            <label data-i18n="f_subject">詢問主題</label>
+            <input type="text" id="f-subject" data-i18n-placeholder="f_subject_ph" placeholder="例：7吋 TFT 客製化詢價"/>
+          </div>
+          <div style="margin-bottom:1.5rem;">
+            <label data-i18n="f_msg">詢問內容 *</label>
+            <textarea id="f-msg" rows="5" data-i18n-placeholder="f_msg_ph" placeholder="請描述您的產品需求、規格或技術問題..."></textarea>
+          </div>
+          <button class="btn-primary" onclick="submitForm()" style="width:100%;font-size:0.9rem;padding:0.9rem;" data-i18n="f_submit">送出詢問</button>
+        </div>
+        <div class="form-sent" id="form-sent">
+          <i class="fa-solid fa-circle-check" style="font-size:3rem;margin-bottom:1rem;display:block;"></i>
+          <h3 style="font-size:1.1rem;color:#fff;margin-bottom:0.5rem;" data-i18n="f_sent_title">詢問已送出！</h3>
+          <p style="color:var(--steel);font-size:0.85rem;" data-i18n="f_sent_desc">感謝您的聯繫，我們將於 1–2 個工作日內回覆您。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- end site-wrapper -->
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="logo-mark" onclick="showSection('home')" style="margin-bottom:1rem;">
+        <img src="./logo.png" alt="ZHIE Technology" style="height:54px;width:auto;object-fit:contain;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.3));"/>
+        <div>
+          <div class="logo-text-sub" style="margin-top:0;">TECHNOLOGY</div>
+        </div>
+      </div>
+      <p style="color:var(--steel);font-size:0.82rem;max-width:260px;line-height:1.7;" data-i18n="footer_desc">致一科技股份有限公司<br>專業 LCD Module 設計開發</p>
+    </div>
+    <div>
+      <p style="color:#fff;font-size:0.82rem;font-weight:600;letter-spacing:0.1em;margin-bottom:1rem;text-transform:uppercase;" data-i18n="footer_nav">導覽</p>
+      <div style="display:flex;flex-direction:column;gap:0.6rem;">
+        <a href="#" onclick="showSection('about');return false;" style="color:var(--steel);font-size:0.82rem;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--steel)'" data-i18n="nav_about">關於我們</a>
+        <a href="#" onclick="showSection('products');return false;" style="color:var(--steel);font-size:0.82rem;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--steel)'" data-i18n="nav_products">產品</a>
+        <a href="#" onclick="showSection('solutions');return false;" style="color:var(--steel);font-size:0.82rem;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--steel)'" data-i18n="nav_solutions">解決方案</a>
+        <a href="#" onclick="showSection('contact');return false;" style="color:var(--steel);font-size:0.82rem;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--steel)'" data-i18n="nav_contact">聯繫我們</a>
+      </div>
+    </div>
+    <div>
+      <p style="color:#fff;font-size:0.82rem;font-weight:600;letter-spacing:0.1em;margin-bottom:1rem;text-transform:uppercase;" data-i18n="footer_contact">聯絡</p>
+      <div style="display:flex;flex-direction:column;gap:0.6rem;">
+        <p style="color:var(--steel);font-size:0.82rem;"><i class="fa-solid fa-phone" style="color:var(--accent);margin-right:8px;width:14px;"></i>02-2771-8076</p>
+        <p style="color:var(--steel);font-size:0.82rem;"><i class="fa-solid fa-envelope" style="color:var(--accent);margin-right:8px;width:14px;"></i>zhie@zhietech.com</p>
+        <p style="color:var(--steel);font-size:0.82rem;line-height:1.6;"><i class="fa-solid fa-location-dot" style="color:var(--accent);margin-right:8px;width:14px;vertical-align:top;margin-top:2px;"></i>221 新北市汐止區<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;福德一路405巷5號</p>
+      </div>
+    </div>
+  </div>
+  <div class="footer-copy">
+    <p>© 2024 致一科技股份有限公司 ZHIE CO.,LTD. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+// ======================== I18N DATA ========================
+var i18n = {
+  'zh-TW': {
+    nav_about:'關於我們', nav_products:'產品', nav_solutions:'解決方案', nav_contact:'聯繫我們',
+    hero_tag:'Since 2017 · LCD Module 專家',
+    hero_title1:'專業顯示模組', hero_title2:'研發設計夥伴',
+    hero_desc:'致一科技專注於 Mono LCM 及 TFT 彩色顯示模組的研發與客製化設計，擁有超過 15 年光電產業經驗，為全球工業、醫療、車載等領域提供高品質顯示解決方案。',
+    hero_btn1:'探索產品', hero_btn2:'聯繫我們', hero_badge_custom:'客製化設計',
+    stat_founded:'成立年份', stat_exp:'年產業經驗', stat_custom:'可客製化', stat_sectors:'應用領域',
+    cap_tag:'Core Capabilities', cap_title:'研發驅動的顯示技術',
+    cap_desc:'從 Mono LCM 控制介面到 TFT 彩色顯示模組，我們提供完整的硬體設計、韌體開發與生產支援。',
+    cap1_title:'Mono LCM 控制介面開發', cap1_desc:'深耕單色液晶顯示模組，提供從驅動 IC 選型、控制板設計到量產的完整解決方案。',
+    cap2_title:'TFT 彩色顯示整合', cap2_desc:'支援 RGB、MIPI、LVDS 等多種介面協定，搭配觸控整合，實現高質感人機介面。',
+    cap3_title:'深度客製化設計服務', cap3_desc:'從規格確認、電路設計、樣品打樣到量產交付，全程配合客戶技術需求，彈性快速響應。',
+    sector_tag:'Application Sectors', sector_title:'多元產業應用',
+    sol1:'工業控制', sol1_desc:'HMI、工控面板、PLC 顯示介面，耐高溫寬溫設計。',
+    sol2:'醫療儀器', sol2_desc:'符合醫療級別要求，高可靠性、低輻射干擾設計。',
+    sol3:'車載顯示', sol3_desc:'寬溫車規設計，抗震動、防濕氣，符合 AEC-Q 規範。',
+    sol4:'智慧家居', sol4_desc:'觸控面板、智慧控制器，低功耗設計，美觀易整合。',
+    cta_tag:'Get In Touch', cta_title:'準備好開始您的顯示模組專案了嗎？',
+    cta_desc:'我們的工程師團隊隨時準備提供技術諮詢，從規格討論到客製化開發，一步到位。', cta_btn:'立即聯繫我們',
+    back:'返回首頁',
+    about_tag:'About ZHIE', about_title:'關於致一科技', about_sub:'成立於 2017 年，專注顯示模組研發，以誠信與品質服務全球客戶',
+    about_story_tag:'Our Story', about_story_title:'由研發驅動的顯示專家',
+    about_p1:'致一科技由資深研發負責人於 2017 年創立，核心團隊成員均擁有超過 15 年以上的光電顯示產業資歷。公司以研發能力為核心競爭力，專精於 LCD Module 與電容式觸控屏的設計開發。',
+    about_p2:'我們從事各類顯示產品，包括 Mono 黑白液晶顯示模組及 TFT 彩色顯示模組，涵蓋周邊電子電路設計，提供完整的客製化液晶顯示與觸控屏解決方案，滿足客戶特定的技術與設計需求。',
+    about_p3:'我們整合內外部資源，以客制化研發、彈性生產、即時交貨，提供「品質第一，顧客滿意」高附加價值的產品與優質服務。',
+    about_timeline_tag:'Milestones',
+    tl1:'致一科技有限公司正式成立，專注 LCD Module 研發設計業務',
+    tl2:'拓展 TFT 彩色顯示模組產品線，導入觸控屏整合服務',
+    tl3:'深化工業、醫療、車載等高端應用市場客製化能力',
+    tl4:'持續強化 HMI 人機介面整合方案，服務全球客戶',
+    about_values_tag:'Core Values', about_values_title:'核心理念',
+    val1:'誠信 Integrity', val1_desc:'誠信是我們與客戶、合作夥伴建立長期關係的基石，每一份承諾都落實到位。',
+    val2:'服務 Service', val2_desc:'以客戶需求為優先，快速響應技術問題，提供從設計到交付的全程支援。',
+    val3:'品質 Quality', val3_desc:'嚴格執行品質管控，「唯一」與「滿意」是我們品質政策的最高宗旨。',
+    val4:'負責 Responsibility', val4_desc:'對每個專案負責到底，從規格確認到量產交付，全程承擔技術責任。',
+    why_tag:'Why ZHIE', why1:'研發團隊主導，技術溝通直接高效', why2:'Mono LCM 及 TFT 雙線產品能力',
+    why3:'小批量客製到大批量生產均可承接', why4:'15 年以上專業人員，技術資歷深厚',
+    prod_tag:'Product Lineup', prod_title:'顯示模組產品', prod_sub:'標準品與客製化產品並行，涵蓋 Mono LCM、TFT 彩色顯示及觸控整合方案',
+    filter_all:'全部', filter_mono:'Mono LCM', filter_tft:'TFT 彩色', filter_touch:'觸控模組', filter_custom:'客製化',
+    p1_name:'2.0" Mono LCM 顯示模組', p1_spec:'128×64 / STN / 可客製介面與 IC\n工業級寬溫，適用儀器儀表',
+    p2_name:'2.4" Mono LCM 顯示模組', p2_spec:'240×128 / STN·FSTN / SPI·I2C\n適用工控面板、儀器設備',
+    p3_name:'4.3" TFT 彩色顯示模組', p3_spec:'480×272 / RGB 介面 / 可含觸控\nHMI 人機介面首選，支援 UART 控制',
+    p4_name:'4.3" HMI 智慧控制顯示器', p4_spec:'480×272 / 內建控制器 / UART 指令集\n拖拉式 UI 設計工具，免程式設計',
+    p5_name:'7.0" TFT 寬螢幕顯示模組', p5_spec:'800×480 / RGB·LVDS 介面 / 可含 CTP\n車載、工控大尺寸應用首選',
+    p6_name:'客製化 LCM 解決方案', p6_spec:'依客戶規格全程設計開發\n電路設計 · 韌體開發 · 樣品打樣 · 量產',
+    prod_cta_title:'找不到符合需求的規格？', prod_cta_desc:'致一科技提供完整客製化設計服務，歡迎提供您的技術規格，我們將評估並回覆報價。', prod_cta_btn:'詢問客製化方案',
+    sol_tag:'Solutions', sol_title:'行業解決方案', sol_sub:'針對不同應用場景，提供專業顯示模組整合方案',
+    sol1_h:'工業控制 Industrial Control', sol1_full:'提供工控 HMI 面板、PLC 控制器顯示介面、工業儀表等應用的顯示模組解決方案。支援寬溫（-40°C～85°C）設計，抗電磁干擾，符合工業級可靠性要求。',
+    sol2_h:'醫療儀器 Medical Equipment', sol2_full:'針對醫療器材顯示需求，提供高可靠性、低電磁輻射、高對比度顯示模組。符合醫療設備對顯示清晰度及穩定性的嚴格要求，支援特殊尺寸定制。',
+    sol3_h:'車載顯示 Automotive Display', sol3_full:'車載顯示模組需通過嚴格的環境測試，我們提供符合車規寬溫設計，抗震動、防濕氣、高亮度（可達 1000nit+）顯示模組，適用儀表板、後座娛樂、導航系統。',
+    sol4_h:'智慧家居 Smart Home', sol4_full:'為智慧家居控制面板、環境感測器顯示介面提供美觀、低功耗的觸控顯示模組。支援超薄邊框設計，色彩還原精準，觸控靈敏，易於整合至各類智慧家居產品。',
+    sol5_h:'消費性電子 Consumer Electronics', sol5_full:'為穿戴式裝置、手持測量儀器、電子標籤等消費性產品提供輕薄、省電、高性能的顯示模組方案，支援快速打樣及彈性量產，協助客戶快速進入市場。',
+    contact_tag:'Get In Touch', contact_title:'聯繫致一科技', contact_sub:'歡迎洽詢產品規格、客製化需求或技術合作',
+    contact_info_tag:'Contact Info', contact_info_title:'聯絡資訊',
+    c_phone_label:'電話', c_email_label:'電子信箱', c_addr_label:'公司地址', c_hours_label:'營業時間', c_hours_val:'週一至週五 09:00–18:00',
+    c_map_btn:'在 Google Maps 中查看',
+    contact_form_tag:'Send Message', contact_form_title:'發送詢問',
+    f_name:'姓名 *', f_name_ph:'您的姓名', f_company:'公司名稱', f_company_ph:'公司名稱（選填）',
+    f_email:'電子信箱 *', f_email_ph:'your@email.com', f_subject:'詢問主題', f_subject_ph:'例：7吋 TFT 客製化詢價',
+    f_msg:'詢問內容 *', f_msg_ph:'請描述您的產品需求、規格或技術問題...', f_submit:'送出詢問',
+    f_sent_title:'詢問已送出！', f_sent_desc:'感謝您的聯繫，我們將於 1–2 個工作日內回覆您。',
+    footer_desc:'致一科技股份有限公司\n專業 LCD Module 設計開發',
+    footer_nav:'導覽', footer_contact:'聯絡'
+  },
+  'zh-CN': {
+    nav_about:'关于我们', nav_products:'产品', nav_solutions:'解决方案', nav_contact:'联系我们',
+    hero_tag:'Since 2017 · LCD Module 专家',
+    hero_title1:'专业显示模组', hero_title2:'研发设计伙伴',
+    hero_desc:'致一科技专注于 Mono LCM 及 TFT 彩色显示模组的研发与定制化设计，拥有超过 15 年光电产业经验，为全球工业、医疗、车载等领域提供高品质显示解决方案。',
+    hero_btn1:'探索产品', hero_btn2:'联系我们', hero_badge_custom:'定制化设计',
+    stat_founded:'成立年份', stat_exp:'年产业经验', stat_custom:'可定制化', stat_sectors:'应用领域',
+    cap_tag:'Core Capabilities', cap_title:'研发驱动的显示技术',
+    cap_desc:'从 Mono LCM 控制接口到 TFT 彩色显示模组，我们提供完整的硬件设计、固件开发与生产支持。',
+    cap1_title:'Mono LCM 控制接口开发', cap1_desc:'深耕单色液晶显示模组，提供从驱动 IC 选型、控制板设计到量产的完整解决方案。',
+    cap2_title:'TFT 彩色显示整合', cap2_desc:'支持 RGB、MIPI、LVDS 等多种接口协议，配合触控整合，实现高质感人机界面。',
+    cap3_title:'深度定制化设计服务', cap3_desc:'从规格确认、电路设计、样品打样到量产交付，全程配合客户技术需求，灵活快速响应。',
+    sector_tag:'Application Sectors', sector_title:'多元产业应用',
+    sol1:'工业控制', sol1_desc:'HMI、工控面板、PLC 显示接口，耐高温宽温设计。',
+    sol2:'医疗仪器', sol2_desc:'符合医疗级别要求，高可靠性、低辐射干扰设计。',
+    sol3:'车载显示', sol3_desc:'宽温车规设计，抗震动、防潮气，符合 AEC-Q 规范。',
+    sol4:'智慧家居', sol4_desc:'触控面板、智慧控制器，低功耗设计，美观易整合。',
+    cta_tag:'Get In Touch', cta_title:'准备好开始您的显示模组项目了吗？',
+    cta_desc:'我们的工程师团队随时准备提供技术咨询，从规格讨论到定制化开发，一步到位。', cta_btn:'立即联系我们',
+    back:'返回首页',
+    about_tag:'About ZHIE', about_title:'关于致一科技', about_sub:'成立于 2017 年，专注显示模组研发，以诚信与品质服务全球客户',
+    about_story_tag:'Our Story', about_story_title:'由研发驱动的显示专家',
+    about_p1:'致一科技由资深研发负责人于 2017 年创立，核心团队成员均拥有超过 15 年以上的光电显示产业资历。公司以研发能力为核心竞争力，专精于 LCD Module 与电容式触控屏的设计开发。',
+    about_p2:'我们从事各类显示产品，包括 Mono 黑白液晶显示模组及 TFT 彩色显示模组，涵盖周边电子电路设计，提供完整的定制化液晶显示与触控屏解决方案。',
+    about_p3:'我们整合内外部资源，以定制化研发、弹性生产、即时交货，提供「品质第一，顾客满意」高附加价值的产品与优质服务。',
+    about_timeline_tag:'Milestones',
+    tl1:'致一科技有限公司正式成立，专注 LCD Module 研发设计业务',
+    tl2:'拓展 TFT 彩色显示模组产品线，导入触控屏整合服务',
+    tl3:'深化工业、医疗、车载等高端应用市场定制化能力',
+    tl4:'持续强化 HMI 人机界面整合方案，服务全球客户',
+    about_values_tag:'Core Values', about_values_title:'核心理念',
+    val1:'诚信 Integrity', val1_desc:'诚信是我们与客户、合作伙伴建立长期关系的基石，每一份承诺都落实到位。',
+    val2:'服务 Service', val2_desc:'以客户需求为优先，快速响应技术问题，提供从设计到交付的全程支持。',
+    val3:'品质 Quality', val3_desc:'严格执行品质管控，「唯一」与「满意」是我们品质政策的最高宗旨。',
+    val4:'负责 Responsibility', val4_desc:'对每个项目负责到底，从规格确认到量产交付，全程承担技术责任。',
+    why_tag:'Why ZHIE', why1:'研发团队主导，技术沟通直接高效', why2:'Mono LCM 及 TFT 双线产品能力',
+    why3:'小批量定制到大批量生产均可承接', why4:'15 年以上专业人员，技术资历深厚',
+    prod_tag:'Product Lineup', prod_title:'显示模组产品', prod_sub:'标准品与定制化产品并行，涵盖 Mono LCM、TFT 彩色显示及触控整合方案',
+    filter_all:'全部', filter_mono:'Mono LCM', filter_tft:'TFT 彩色', filter_touch:'触控模组', filter_custom:'定制化',
+    p1_name:'2.0" Mono LCM 显示模组', p1_spec:'128×64 / STN / 可定制接口与 IC\n工业级宽温，适用仪器仪表',
+    p2_name:'2.4" Mono LCM 显示模组', p2_spec:'240×128 / STN·FSTN / SPI·I2C\n适用工控面板、仪器设备',
+    p3_name:'4.3" TFT 彩色显示模组', p3_spec:'480×272 / RGB 接口 / 可含触控\nHMI 人机界面首选，支持 UART 控制',
+    p4_name:'4.3" HMI 智能控制显示器', p4_spec:'480×272 / 内建控制器 / UART 指令集\n拖拉式 UI 设计工具，免编程',
+    p5_name:'7.0" TFT 宽屏显示模组', p5_spec:'800×480 / RGB·LVDS 接口 / 可含 CTP\n车载、工控大尺寸应用首选',
+    p6_name:'定制化 LCM 解决方案', p6_spec:'依客户规格全程设计开发\n电路设计 · 固件开发 · 样品打样 · 量产',
+    prod_cta_title:'找不到符合需求的规格？', prod_cta_desc:'致一科技提供完整定制化设计服务，欢迎提供您的技术规格，我们将评估并回复报价。', prod_cta_btn:'询问定制化方案',
+    sol_tag:'Solutions', sol_title:'行业解决方案', sol_sub:'针对不同应用场景，提供专业显示模组整合方案',
+    sol1_h:'工业控制 Industrial Control', sol1_full:'提供工控 HMI 面板、PLC 控制器显示接口、工业仪表等应用的显示模组解决方案。支持宽温（-40°C～85°C）设计，抗电磁干扰，符合工业级可靠性要求。',
+    sol2_h:'医疗仪器 Medical Equipment', sol2_full:'针对医疗器材显示需求，提供高可靠性、低电磁辐射、高对比度显示模组。符合医疗设备对显示清晰度及稳定性的严格要求，支持特殊尺寸定制。',
+    sol3_h:'车载显示 Automotive Display', sol3_full:'车载显示模组需通过严格的环境测试，我们提供符合车规宽温设计，抗震动、防湿气、高亮度（可达 1000nit+）显示模组，适用仪表板、后座娱乐、导航系统。',
+    sol4_h:'智能家居 Smart Home', sol4_full:'为智能家居控制面板、环境传感器显示接口提供美观、低功耗的触控显示模组。支持超薄边框设计，色彩还原精准，触控灵敏，易于整合至各类智能家居产品。',
+    sol5_h:'消费类电子 Consumer Electronics', sol5_full:'为穿戴式设备、手持测量仪器、电子标签等消费类产品提供轻薄、省电、高性能的显示模组方案，支持快速打样及弹性量产，协助客户快速进入市场。',
+    contact_tag:'Get In Touch', contact_title:'联系致一科技', contact_sub:'欢迎洽询产品规格、定制化需求或技术合作',
+    contact_info_tag:'Contact Info', contact_info_title:'联络信息',
+    c_phone_label:'电话', c_email_label:'电子邮箱', c_addr_label:'公司地址', c_hours_label:'营业时间', c_hours_val:'周一至周五 09:00–18:00',
+    c_map_btn:'在 Google Maps 中查看',
+    contact_form_tag:'Send Message', contact_form_title:'发送询问',
+    f_name:'姓名 *', f_name_ph:'您的姓名', f_company:'公司名称', f_company_ph:'公司名称（选填）',
+    f_email:'电子邮箱 *', f_email_ph:'your@email.com', f_subject:'询问主题', f_subject_ph:'例：7寸 TFT 定制化询价',
+    f_msg:'询问内容 *', f_msg_ph:'请描述您的产品需求、规格或技术问题...', f_submit:'发送询问',
+    f_sent_title:'询问已发送！', f_sent_desc:'感谢您的联系，我们将于 1–2 个工作日内回复您。',
+    footer_desc:'致一科技股份有限公司\n专业 LCD Module 设计开发',
+    footer_nav:'导览', footer_contact:'联络'
+  },
+  'en': {
+    nav_about:'About', nav_products:'Products', nav_solutions:'Solutions', nav_contact:'Contact',
+    hero_tag:'Since 2017 · LCD Module Expert',
+    hero_title1:'Professional Display', hero_title2:'Module Partner',
+    hero_desc:'ZHIE Technology specializes in R&D and customization of Mono LCM and TFT color display modules, with 15+ years of optoelectronics expertise serving industrial, medical, and automotive markets worldwide.',
+    hero_btn1:'Explore Products', hero_btn2:'Contact Us', hero_badge_custom:'Custom Design',
+    stat_founded:'Founded', stat_exp:'Years Experience', stat_custom:'Customizable', stat_sectors:'Sectors Served',
+    cap_tag:'Core Capabilities', cap_title:'R&D-Driven Display Technology',
+    cap_desc:'From Mono LCM control interfaces to TFT color display modules, we deliver complete hardware design, firmware development, and production support.',
+    cap1_title:'Mono LCM Control Interface', cap1_desc:'Expertise in monochrome LCD modules — driver IC selection, control board design, and full production support.',
+    cap2_title:'TFT Color Display Integration', cap2_desc:'RGB, MIPI, and LVDS interface support with touch integration for high-quality HMI solutions.',
+    cap3_title:'Deep Customization Service', cap3_desc:'From spec definition and circuit design to prototyping and mass production — fully tailored to your technical requirements.',
+    sector_tag:'Application Sectors', sector_title:'Multi-Industry Applications',
+    sol1:'Industrial Control', sol1_desc:'HMI panels, PLC displays, wide-temperature industrial design.',
+    sol2:'Medical Equipment', sol2_desc:'Medical-grade reliability, low EMI, high-contrast displays.',
+    sol3:'Automotive Display', sol3_desc:'AEC-Q compliant, vibration-resistant, wide-temp automotive design.',
+    sol4:'Smart Home', sol4_desc:'Touch panels, smart controllers, low power, seamless integration.',
+    cta_tag:'Get In Touch', cta_title:'Ready to Start Your Display Module Project?',
+    cta_desc:'Our engineering team is ready to provide technical consultation — from spec discussions to full custom development.',
+    cta_btn:'Contact Us Now',
+    back:'Back to Home',
+    about_tag:'About ZHIE', about_title:'About ZHIE Technology', about_sub:'Founded in 2017, focused on display module R&D, serving global clients with integrity and quality',
+    about_story_tag:'Our Story', about_story_title:'An R&D-Driven Display Expert',
+    about_p1:'ZHIE Technology was founded in 2017 by a senior R&D specialist. The core team holds 15+ years of experience in the optoelectronics industry, with deep expertise in LCD Module and capacitive touchscreen design.',
+    about_p2:'We develop all types of display products including Mono LCD modules and TFT color display modules, along with peripheral circuit design, delivering complete customized LCD and touchscreen solutions for specific technical requirements.',
+    about_p3:'We integrate internal and external resources to offer custom R&D, flexible production, and on-time delivery — providing high-value products and services centered on quality and customer satisfaction.',
+    about_timeline_tag:'Milestones',
+    tl1:'ZHIE Technology established, focused on LCD Module R&D and design',
+    tl2:'Expanded TFT color display product line with touchscreen integration',
+    tl3:'Deepened customization capabilities for industrial, medical, and automotive markets',
+    tl4:'Continued HMI integration development, serving global customers',
+    about_values_tag:'Core Values', about_values_title:'Core Values',
+    val1:'Integrity', val1_desc:'Integrity is the foundation of every long-term relationship we build with clients and partners.',
+    val2:'Service', val2_desc:'Customer-first philosophy — rapid technical response and full support from design to delivery.',
+    val3:'Quality', val3_desc:'Rigorous quality control. "Unique" and "Satisfaction" are our highest quality commitments.',
+    val4:'Responsibility', val4_desc:'We own every project end-to-end, from spec to mass production.',
+    why_tag:'Why ZHIE', why1:'Engineering-led — direct and efficient technical communication',
+    why2:'Dual capability: Mono LCM and TFT color displays',
+    why3:'From small-batch custom to high-volume production',
+    why4:'15+ years of industry expertise across the team',
+    prod_tag:'Product Lineup', prod_title:'Display Module Products', prod_sub:'Standard and custom products spanning Mono LCM, TFT color displays, and touch integration',
+    filter_all:'All', filter_mono:'Mono LCM', filter_tft:'TFT Color', filter_touch:'Touch Module', filter_custom:'Custom',
+    p1_name:'2.0" Mono LCM Display Module', p1_spec:'128×64 / STN / Customizable interface & IC\nIndustrial wide-temp, instruments & meters',
+    p2_name:'2.4" Mono LCM Display Module', p2_spec:'240×128 / STN·FSTN / SPI·I2C\nIndustrial panels, instrumentation',
+    p3_name:'4.3" TFT Color Display Module', p3_spec:'480×272 / RGB interface / Optional touch\nIdeal HMI panel, UART control support',
+    p4_name:'4.3" HMI Smart Control Display', p4_spec:'480×272 / Built-in controller / UART command set\nDrag-and-drop UI design tool, no coding required',
+    p5_name:'7.0" TFT Wide Display Module', p5_spec:'800×480 / RGB·LVDS interface / Optional CTP\nPreferred for automotive and industrial large-format',
+    p6_name:'Custom LCM Solution', p6_spec:'Full design development per customer specs\nCircuit · Firmware · Prototype · Mass Production',
+    prod_cta_title:"Can't find the right specification?", prod_cta_desc:'ZHIE offers complete custom design services. Share your technical specs and we\'ll provide an evaluation and quote.', prod_cta_btn:'Inquire About Custom Solutions',
+    sol_tag:'Solutions', sol_title:'Industry Solutions', sol_sub:'Professional display module integration for diverse application scenarios',
+    sol1_h:'Industrial Control', sol1_full:'Display module solutions for HMI panels, PLC controllers, and industrial instruments. Supports wide-temperature (-40°C to 85°C) design, EMI resistance, and industrial-grade reliability.',
+    sol2_h:'Medical Equipment', sol2_full:'High-reliability, low-EMI, high-contrast display modules for medical devices. Meets stringent requirements for clarity and stability in medical equipment, with custom size support.',
+    sol3_h:'Automotive Display', sol3_full:'Automotive display modules with wide-temperature design, vibration and moisture resistance, and high brightness (1000nit+). Suitable for dashboards, rear entertainment, and navigation systems.',
+    sol4_h:'Smart Home', sol4_full:'Elegant, low-power touchscreen display modules for smart home control panels and environmental sensors. Ultra-slim bezel design, accurate color reproduction, and seamless product integration.',
+    sol5_h:'Consumer Electronics', sol5_full:'Lightweight, power-efficient display modules for wearables, handheld instruments, and electronic labels. Fast prototyping and flexible production for rapid market entry.',
+    contact_tag:'Get In Touch', contact_title:'Contact ZHIE Technology', contact_sub:'Inquire about product specs, custom requirements, or technical partnerships',
+    contact_info_tag:'Contact Info', contact_info_title:'Contact Information',
+    c_phone_label:'Phone', c_email_label:'Email', c_addr_label:'Address', c_hours_label:'Business Hours', c_hours_val:'Monday–Friday 09:00–18:00',
+    c_map_btn:'View on Google Maps',
+    contact_form_tag:'Send Message', contact_form_title:'Send Inquiry',
+    f_name:'Name *', f_name_ph:'Your name', f_company:'Company', f_company_ph:'Company name (optional)',
+    f_email:'Email *', f_email_ph:'your@email.com', f_subject:'Subject', f_subject_ph:'e.g. 7" TFT custom module inquiry',
+    f_msg:'Message *', f_msg_ph:'Please describe your product needs, specs, or technical questions...', f_submit:'Send Inquiry',
+    f_sent_title:'Inquiry Sent!', f_sent_desc:'Thank you for reaching out. We will reply within 1–2 business days.',
+    footer_desc:'ZHIE CO., LTD.\nProfessional LCD Module Design & Development',
+    footer_nav:'Navigation', footer_contact:'Contact'
+  },
+  'ja': {
+    nav_about:'会社概要', nav_products:'製品', nav_solutions:'ソリューション', nav_contact:'お問い合わせ',
+    hero_tag:'Since 2017 · LCDモジュール専門',
+    hero_title1:'プロフェッショナル', hero_title2:'ディスプレイパートナー',
+    hero_desc:'ZHIE Technologyは、Mono LCMおよびTFTカラーディスプレイモジュールの研究開発とカスタマイズに特化し、15年以上の光電産業経験を持ち、工業、医療、車載分野に高品質なソリューションを提供します。',
+    hero_btn1:'製品を見る', hero_btn2:'お問い合わせ', hero_badge_custom:'カスタム設計',
+    stat_founded:'設立年', stat_exp:'年の経験', stat_custom:'カスタマイズ可', stat_sectors:'応用分野',
+    cap_tag:'Core Capabilities', cap_title:'R&D主導のディスプレイ技術',
+    cap_desc:'Mono LCMコントロールインターフェースからTFTカラーディスプレイモジュールまで、完全なハードウェア設計、ファームウェア開発、生産サポートを提供します。',
+    cap1_title:'Mono LCMコントロール開発', cap1_desc:'モノクロ液晶モジュールに深く精通し、ドライバIC選定から量産まで完全なソリューションを提供。',
+    cap2_title:'TFTカラーディスプレイ統合', cap2_desc:'RGB、MIPI、LVDSなど複数のインターフェースに対応し、タッチ統合で高品質HMIを実現。',
+    cap3_title:'深度カスタマイズサービス', cap3_desc:'仕様確認から回路設計、試作、量産まで、顧客の技術要件に柔軟に対応します。',
+    sector_tag:'Application Sectors', sector_title:'多様な産業への応用',
+    sol1:'産業制御', sol1_desc:'HMIパネル、PLC表示、広温度範囲設計。',
+    sol2:'医療機器', sol2_desc:'医療グレードの信頼性、低EMI設計。',
+    sol3:'車載ディスプレイ', sol3_desc:'AEC-Q準拠、耐振動・防湿設計。',
+    sol4:'スマートホーム', sol4_desc:'タッチパネル、低消費電力、シームレス統合。',
+    cta_tag:'Get In Touch', cta_title:'ディスプレイモジュールプロジェクトを始めましょう',
+    cta_desc:'エンジニアチームが技術コンサルティングからカスタム開発まで対応します。', cta_btn:'今すぐお問い合わせ',
+    back:'ホームへ戻る',
+    about_tag:'About ZHIE', about_title:'ZHIE Technologyについて', about_sub:'2017年設立、ディスプレイモジュール研究開発に特化',
+    about_story_tag:'Our Story', about_story_title:'R&D主導のディスプレイ専門家',
+    about_p1:'ZHIE Technologyは2017年に経験豊富なR&D専門家によって設立されました。コアチームは15年以上の光電ディスプレイ産業経験を持ち、LCDモジュールと静電容量式タッチスクリーンの設計開発を専門としています。',
+    about_p2:'モノクロLCDモジュールからTFTカラーモジュールまで、周辺回路設計を含む完全なカスタマイズソリューションを提供します。',
+    about_p3:'内外部リソースを統合し、カスタムR&D、柔軟な生産、迅速な納品で、品質第一・顧客満足の高付加価値サービスを提供します。',
+    about_timeline_tag:'Milestones',
+    tl1:'ZHIE Technology設立、LCDモジュール研究開発事業に注力',
+    tl2:'TFTカラーディスプレイ製品ライン拡大、タッチスクリーン統合サービス開始',
+    tl3:'産業・医療・車載向け高度カスタマイズ能力を強化',
+    tl4:'HMIインターフェース統合ソリューションを継続強化、グローバル顧客へサービス提供',
+    about_values_tag:'Core Values', about_values_title:'コアバリュー',
+    val1:'誠実さ Integrity', val1_desc:'誠実さは顧客やパートナーとの長期的な関係の礎です。',
+    val2:'サービス Service', val2_desc:'顧客ニーズを優先し、設計から納品まで迅速なサポートを提供。',
+    val3:'品質 Quality', val3_desc:'厳格な品質管理。「唯一」と「満足」が最高の品質目標。',
+    val4:'責任 Responsibility', val4_desc:'仕様確認から量産まで、すべての工程に責任を持ちます。',
+    why_tag:'Why ZHIE', why1:'エンジニア主導の直接的かつ効率的な技術コミュニケーション',
+    why2:'Mono LCMとTFTの両方に対応する製品能力',
+    why3:'小ロットカスタムから大量生産まで対応',
+    why4:'15年以上の専門人材による深い技術力',
+    prod_tag:'Product Lineup', prod_title:'ディスプレイモジュール製品', prod_sub:'標準品とカスタム品を並行提供',
+    filter_all:'すべて', filter_mono:'Mono LCM', filter_tft:'TFTカラー', filter_touch:'タッチモジュール', filter_custom:'カスタム',
+    p1_name:'2.0" Mono LCMディスプレイモジュール', p1_spec:'128×64 / STN / インターフェース・ICカスタマイズ可\n産業用広温度範囲対応',
+    p2_name:'2.4" Mono LCMディスプレイモジュール', p2_spec:'240×128 / STN·FSTN / SPI·I2C\n産業用パネル、計測器向け',
+    p3_name:'4.3" TFTカラーディスプレイモジュール', p3_spec:'480×272 / RGBインターフェース / タッチ対応可\nHMIパネル最適解',
+    p4_name:'4.3" HMIスマートコントロールディスプレイ', p4_spec:'480×272 / 内蔵コントローラー / UARTコマンド\nドラッグ&ドロップUI設計ツール',
+    p5_name:'7.0" TFTワイドディスプレイモジュール', p5_spec:'800×480 / RGB·LVDSインターフェース / CTP対応可\n車載・産業用大型アプリケーション向け',
+    p6_name:'カスタムLCMソリューション', p6_spec:'顧客仕様に合わせた完全設計開発\n回路設計・ファームウェア・試作・量産',
+    prod_cta_title:'必要な仕様が見つかりませんか？', prod_cta_desc:'ZHIEは完全なカスタム設計サービスを提供します。技術仕様をお送りいただければ、評価と見積もりをご回答します。', prod_cta_btn:'カスタムソリューションを問い合わせる',
+    sol_tag:'Solutions', sol_title:'業界別ソリューション', sol_sub:'様々なアプリケーションシナリオに対応した専門ディスプレイモジュール統合ソリューション',
+    sol1_h:'産業制御 Industrial Control', sol1_full:'HMIパネル、PLCコントローラーディスプレイ、産業計測器向けのディスプレイモジュールソリューション。広温度範囲（-40°C～85°C）設計、EMI耐性、産業グレードの信頼性。',
+    sol2_h:'医療機器 Medical Equipment', sol2_full:'医療器具の表示ニーズに対応した高信頼性・低EMI・高コントラストディスプレイモジュール。特殊サイズのカスタマイズも対応。',
+    sol3_h:'車載ディスプレイ Automotive Display', sol3_full:'車載用広温度範囲設計、耐振動・防湿、高輝度（1000nit+）ディスプレイモジュール。インストルメントパネル、リアエンターテインメント、ナビゲーションシステムに対応。',
+    sol4_h:'スマートホーム Smart Home', sol4_full:'スマートホームコントロールパネルや環境センサー向けの低消費電力タッチディスプレイモジュール。超薄ベゼル設計、精確な色再現、高感度タッチ。',
+    sol5_h:'コンシューマーエレクトロニクス Consumer Electronics', sol5_full:'ウェアラブルデバイス、ハンドヘルド測定器、電子タグなど向けの軽量・省電力・高性能ディスプレイモジュール。迅速なプロトタイピングと柔軟な量産対応。',
+    contact_tag:'Get In Touch', contact_title:'ZHIEへのお問い合わせ', contact_sub:'製品仕様、カスタマイズ要件、技術提携についてお問い合わせください',
+    contact_info_tag:'Contact Info', contact_info_title:'連絡先情報',
+    c_phone_label:'電話番号', c_email_label:'メールアドレス', c_addr_label:'住所', c_hours_label:'営業時間', c_hours_val:'月曜〜金曜 09:00–18:00',
+    c_map_btn:'Google Mapsで見る',
+    contact_form_tag:'Send Message', contact_form_title:'お問い合わせ送信',
+    f_name:'お名前 *', f_name_ph:'お名前', f_company:'会社名', f_company_ph:'会社名（任意）',
+    f_email:'メールアドレス *', f_email_ph:'your@email.com', f_subject:'お問い合わせ件名', f_subject_ph:'例：7インチTFTカスタム見積もり',
+    f_msg:'お問い合わせ内容 *', f_msg_ph:'製品要件、仕様、技術的なご質問を入力してください...', f_submit:'送信する',
+    f_sent_title:'送信完了！', f_sent_desc:'お問い合わせありがとうございます。1〜2営業日以内にご返答いたします。',
+    footer_desc:'致一科技股份有限公司\n専門LCDモジュール設計開発',
+    footer_nav:'ナビゲーション', footer_contact:'連絡先'
+  }
+};
+
+// ======================== STATE ========================
+var currentLang = 'zh-TW';
+var currentSection = 'home';
+var langLabels = { 'zh-TW':'繁中', 'zh-CN':'簡中', 'en':'EN', 'ja':'JP' };
+
+// ======================== LANG ========================
+function setLang(lang) {
+  currentLang = lang;
+  document.getElementById('lang-current').textContent = langLabels[lang];
+  var dropdown = document.getElementById('lang-dropdown');
+  dropdown.style.display = 'none';
+  var t = i18n[lang];
+  // Update all [data-i18n] elements
+  document.querySelectorAll('[data-i18n]').forEach(function(el) {
+    var key = el.getAttribute('data-i18n');
+    if (t[key] !== undefined) {
+      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+        el.placeholder = t[key];
+      } else {
+        el.textContent = t[key];
+      }
+    }
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
+    var key = el.getAttribute('data-i18n-placeholder');
+    if (t[key] !== undefined) el.placeholder = t[key];
+  });
+  document.documentElement.lang = lang;
+  // Update active state
+  document.querySelectorAll('#lang-dropdown button').forEach(function(btn) {
+    btn.classList.toggle('active', btn.textContent.trim() === document.getElementById('lang-current').parentElement.textContent.trim());
+  });
+}
+
+function toggleLangMenu() {
+  var d = document.getElementById('lang-dropdown');
+  d.style.display = d.style.display === 'none' ? 'block' : 'none';
+}
+
+document.addEventListener('click', function(e) {
+  var btn = document.getElementById('lang-toggle-btn');
+  var dd = document.getElementById('lang-dropdown');
+  if (!btn.contains(e.target) && !dd.contains(e.target)) {
+    dd.style.display = 'none';
+  }
+});
+
+// ======================== NAVIGATION ========================
+function showSection(name) {
+  currentSection = name;
+  document.querySelectorAll('.page-section').forEach(function(s) { s.classList.remove('active'); });
+  var target = document.getElementById('sec-' + name);
+  if (target) target.classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(function(a) {
+    a.classList.toggle('active', a.id === 'nav-' + name);
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  observeFadeIns();
+  if (name === 'products') loadProducts();
+}
+
+function toggleMobileMenu() {
+  var m = document.getElementById('mobile-menu');
+  m.classList.toggle('open');
+}
+
+// ======================== SUPABASE CONFIG ========================
+// 【步驟1】登入 supabase.com → 選你的專案 → 左側選 Project Settings → API
+// → 複製「Project URL」貼在下方引號內（取代整段 https://...supabase.co）
+var SB_URL = 'https://jlrapmlgxxighsqlziru.supabase.co';
+
+// 【步驟2】同一個 API 頁面 → 往下找「anon public」那欄 → 複製該 key 貼在下方引號內
+var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpscmFwbWxneHhpZ2hzcWx6aXJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NjYzMjIsImV4cCI6MjA5NjE0MjMyMn0.57kKgbI8FTK3J_olPu55GBJpZrB6DP_bkyx6oqymLzo';
+
+// ======================== LOAD PRODUCTS FROM SUPABASE ========================
+var allProducts = [];
+
+async function loadProducts() {
+  var grid = document.getElementById('products-grid');
+  try {
+    var res = await fetch(SB_URL + '/rest/v1/products?status=eq.active&order=created_at.asc', {
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    var data = await res.json();
+    allProducts = Array.isArray(data) ? data : [];
+    renderProducts(allProducts);
+  } catch(e) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--steel);">載入失敗，請稍後再試</div>';
+  }
+}
+
+function getBadgeHtml(cat) {
+  var map = {
+    mono: '<span class="product-badge badge-mono">Mono</span>',
+    tft:  '<span class="product-badge badge-tft">TFT</span>',
+    touch:'<span class="product-badge badge-touch">Touch</span>',
+    custom:'<span class="product-badge badge-custom">客製化</span>'
+  };
+  return map[cat] || '<span class="product-badge badge-tft">' + (cat||'') + '</span>';
+}
+
+function getDefaultSVG(cat) {
+  var colors = { mono:'#8ba4c0', tft:'#00c8ff', touch:'#50ff78', custom:'#b088ff' };
+  var col = colors[cat] || '#00c8ff';
+  return '<svg viewBox="0 0 300 188" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">'
+    + '<rect width="300" height="188" fill="#000810"/>'
+    + '<rect x="10" y="10" width="280" height="168" rx="4" fill="#000d1a"/>'
+    + '<rect x="20" y="20" width="260" height="20" rx="3" fill="rgba(' + (cat==='mono'?'139,164,192':'0,200,255') + ',0.1)" stroke="rgba(' + (cat==='mono'?'139,164,192':'0,200,255') + ',0.2)" stroke-width="0.5"/>'
+    + '<text x="150" y="34" text-anchor="middle" font-size="8" fill="' + col + '" font-family="monospace">ZHIE LCM DISPLAY MODULE</text>'
+    + '<rect x="80" y="55" width="140" height="80" rx="6" fill="rgba(255,255,255,0.02)" stroke="' + col + '" stroke-width="0.5" stroke-opacity="0.3"/>'
+    + '<text x="150" y="102" text-anchor="middle" font-size="28" fill="' + col + '" font-family="monospace" opacity="0.5">LCD</text>'
+    + '<text x="150" y="160" text-anchor="middle" font-size="7" fill="#8ba4c0" font-family="monospace" opacity="0.4">ZHIE CO.,LTD.</text>'
+    + '</svg>';
+}
+
+function renderProducts(products) {
+  var grid = document.getElementById('products-grid');
+  if (!products || products.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--steel);"><i class="fa-solid fa-box-open" style="font-size:2rem;display:block;margin-bottom:1rem;opacity:0.4;"></i>目前無產品資訊</div>';
+    return;
+  }
+  grid.innerHTML = '';
+  products.forEach(function(p) {
+    var card = document.createElement('div');
+    card.className = 'product-card';
+    card.setAttribute('data-cat', p.category || 'tft');
+    card.setAttribute('onclick', "showSection('contact')");
+
+    var screenHtml = p.image_url
+      ? '<img src="' + p.image_url + '" style="width:100%;height:100%;object-fit:cover;display:block;" alt="' + (p.name_tw||'') + '"/>'
+      : getDefaultSVG(p.category);
+
+    var lang = currentLang;
+    var name = (lang === 'zh-CN' && p.name_cn) ? p.name_cn
+             : (lang === 'en' && p.name_en) ? p.name_en
+             : (lang === 'ja' && p.name_ja) ? p.name_ja
+             : (p.name_tw || p.name_en || '');
+
+    card.innerHTML =
+      '<div class="product-screen">' + screenHtml + '</div>' +
+      '<div class="product-info">' +
+        '<div class="product-name">' + name + '</div>' +
+        '<div class="product-spec">' + (p.spec || '') + '</div>' +
+        '<div style="margin-top:0.5rem;">' + getBadgeHtml(p.category) + '</div>' +
+      '</div>';
+    grid.appendChild(card);
+  });
+  observeFadeIns();
+}
+
+// ======================== PRODUCTS FILTER ========================
+function filterProducts(cat, btn) {
+  var filtered = cat === 'all' ? allProducts : allProducts.filter(function(p){ return p.category === cat; });
+  renderProducts(filtered);
+  document.querySelectorAll('#prod-filters button').forEach(function(b) {
+    b.className = 'btn-secondary';
+    b.style.fontSize = '0.78rem'; b.style.padding = '0.5rem 1.25rem';
+  });
+  btn.className = 'btn-primary';
+  btn.style.fontSize = '0.78rem'; btn.style.padding = '0.5rem 1.25rem';
+}
+
+function openProductDetail(id) {
+  // Future: expand to sub-detail modal. For now, redirect to contact.
+  showSection('contact');
+}
+
+// ======================== CONTACT FORM ========================
+function submitForm() {
+  var name = document.getElementById('f-name').value;
+  var email = document.getElementById('f-email').value;
+  var msg = document.getElementById('f-msg').value;
+  if (!name || !email || !msg) {
+    alert(currentLang === 'ja' ? '必須項目をご入力ください。' : currentLang === 'en' ? 'Please fill in all required fields.' : '請填寫所有必填欄位。');
+    return;
+  }
+  document.getElementById('contact-form').style.display = 'none';
+  document.getElementById('form-sent').style.display = 'block';
+}
+
+// ======================== BACKGROUND CANVAS ========================
+(function() {
+  var canvas = document.getElementById('bg-canvas');
+  var ctx = canvas.getContext('2d');
+  var particles = [];
+  var W, H;
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  for (var i = 0; i < 60; i++) {
+    particles.push({
+      x: Math.random() * 1920,
+      y: Math.random() * 1080,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      r: Math.random() * 1.5 + 0.5,
+      a: Math.random() * 0.5 + 0.1
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach(function(p) {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+      ctx.beginPath();
+      ctx.arc(p.x * W / 1920, p.y * H / 1080, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0,200,255,' + p.a + ')';
+      ctx.fill();
+    });
+    // Draw connecting lines
+    for (var i = 0; i < particles.length; i++) {
+      for (var j = i + 1; j < particles.length; j++) {
+        var dx = (particles[i].x - particles[j].x) * W / 1920;
+        var dy = (particles[i].y - particles[j].y) * H / 1080;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 120) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x * W / 1920, particles[i].y * H / 1080);
+          ctx.lineTo(particles[j].x * W / 1920, particles[j].y * H / 1080);
+          ctx.strokeStyle = 'rgba(0,200,255,' + (0.08 * (1 - dist / 120)) + ')';
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ======================== SCROLL / FADE ========================
+window.addEventListener('scroll', function() {
+  var nav = document.getElementById('main-nav');
+  nav.classList.toggle('scrolled', window.scrollY > 30);
+  observeFadeIns();
+});
+
+function observeFadeIns() {
+  document.querySelectorAll('.fade-in').forEach(function(el) {
+    var rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight - 60) el.classList.add('visible');
+  });
+}
+setTimeout(observeFadeIns, 100);
+</script>
+</body>
+</html>
