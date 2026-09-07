@@ -88,9 +88,9 @@ body{font-family:'Noto Sans TC','Inter',system-ui,sans-serif;background:#f4f6f9;
 .size-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;}
 .size-card{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;transition:all 0.18s;}
 .size-card:hover{border-color:var(--blue);box-shadow:var(--shadow);transform:translateY(-2px);}
-.size-card-img{aspect-ratio:4/3;overflow:hidden;background:var(--gray-100);display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--gray-200);}
-.size-card-img img{width:100%;height:100%;object-fit:cover;transition:transform 0.3s;}
-.size-card:hover .size-card-img img{transform:scale(1.03);}
+.size-card-img{aspect-ratio:4/3;overflow:hidden;background:#fff;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--gray-200);}
+.size-card-img img{width:100%;height:100%;object-fit:contain;padding:10px;transition:transform 0.3s;}
+.size-card:hover .size-card-img img{transform:scale(1.04);}
 .size-card-img-ph{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--gray-300);font-size:12px;}
 .size-card-body{padding:14px 16px;}
 .size-card-inch{font-size:20px;font-weight:700;color:var(--navy);margin-bottom:3px;}
@@ -225,7 +225,7 @@ textarea.form-input{resize:none;height:88px;line-height:1.6;}
     </div>
     <div class="hero-visual">
       <div class="hero-img">
-        <img src="https://zyzmadwlvlgoamppaosg.supabase.co/storage/v1/object/public/products/7inch.jpg" alt="ZHIE TFT Display Module"/>
+        <img src="https://zyzmadwlvlgoamppaosg.supabase.co/storage/v1/object/public/products/12_1inch.jpg" alt="ZHIE TFT Display Module" style="width:100%;height:100%;object-fit:contain;padding:16px;background:#fff;"/>
       </div>
     </div>
   </div>
