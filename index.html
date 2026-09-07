@@ -229,7 +229,7 @@ textarea.form-input{resize:none;height:88px;line-height:1.6;}
     </div>
     <div class="hero-visual">
       <div class="hero-img">
-        <img src="https://zyzmadwlvlgoamppaosg.supabase.co/storage/v1/object/public/products/12_1inch.jpg" alt="ZHIE TFT Display Module" style="width:100%;height:100%;object-fit:cover;"/>
+        <img id="hero-img" src="https://zyzmadwlvlgoamppaosg.supabase.co/storage/v1/object/public/products/12_1inch.jpg" alt="ZHIE TFT Display Module" style="width:100%;height:100%;object-fit:cover;"/>
       </div>
     </div>
   </div>
@@ -572,6 +572,7 @@ async function loadSiteSettings(){
   if(s.about_img){var b=document.getElementById('about-img');if(b)b.innerHTML='<img src="'+s.about_img+'" alt="關於我們" style="width:100%;height:100%;object-fit:cover;"/>';}
   if(s.contact_email){var e=document.getElementById('c-email');if(e)e.textContent=s.contact_email;}
   if(s.contact_addr){var e=document.getElementById('c-addr');if(e)e.textContent=s.contact_addr;}
+  if(s.hero_img){var h=document.getElementById('hero-img');if(h)h.src=s.hero_img;}
 }
 
 window.addEventListener('DOMContentLoaded',function(){loadProducts();loadSiteSettings();});

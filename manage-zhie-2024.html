@@ -165,6 +165,7 @@ textarea.inp{resize:none;line-height:1.6;}
       <div class="nav-section">主選單</div>
       <div class="nav-item active" onclick="showPage('dashboard')"><i class="fa-solid fa-chart-pie"></i> 儀表板</div>
       <div class="nav-section">內容管理</div>
+      <div class="nav-item" onclick="showPage('homepage')"><i class="fa-solid fa-house"></i> 首頁設定</div>
       <div class="nav-item" onclick="showPage('products')"><i class="fa-solid fa-microchip"></i> 產品管理</div>
       <div class="nav-item" onclick="showPage('about')"><i class="fa-solid fa-building"></i> 關於我們</div>
       <div class="nav-item" onclick="showPage('contact')"><i class="fa-solid fa-address-card"></i> 聯絡資訊</div>
@@ -196,6 +197,37 @@ textarea.inp{resize:none;line-height:1.6;}
             <button class="btn btn-primary" onclick="showPage('products');openProductModal(null)"><i class="fa-solid fa-plus"></i> 新增產品</button>
             <button class="btn btn-ghost" onclick="showPage('products')"><i class="fa-solid fa-microchip"></i> 管理產品</button>
             <button class="btn btn-ghost" onclick="showPage('about')"><i class="fa-solid fa-building"></i> 編輯關於我們</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- HOMEPAGE -->
+      <div id="page-homepage" style="display:none;">
+        <div class="card">
+          <div class="card-title"><i class="fa-solid fa-image" style="color:var(--blue);"></i> 首頁 Hero 主圖片</div>
+          <div class="grid2" style="align-items:start;">
+            <div>
+              <div class="lbl">目前圖片</div>
+              <div id="hero-img-preview" style="background:var(--gray-100);border:1px solid var(--gray-200);border-radius:var(--radius);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;color:var(--gray-300);font-size:13px;margin-bottom:10px;">尚未上傳</div>
+              <div class="img-upload-area" onclick="document.getElementById('hero-img-input').click()">
+                <i class="fa-solid fa-cloud-arrow-up" style="font-size:24px;color:var(--gray-300);display:block;margin-bottom:8px;"></i>
+                <div style="font-size:13px;color:var(--gray-500);">點擊或拖曳上傳圖片</div>
+                <div style="font-size:11px;color:var(--gray-300);margin-top:4px;">建議尺寸：1200×900px 以上</div>
+              </div>
+              <input type="file" id="hero-img-input" accept="image/*" style="display:none;" onchange="startCrop(this,'hero')"/>
+            </div>
+            <div id="hero-crop-area" style="display:none;">
+              <div class="lbl">裁切圖片</div>
+              <div class="cropper-wrap"><img id="hero-crop-img"/></div>
+              <div style="display:flex;gap:8px;margin-top:10px;">
+                <button class="btn btn-primary btn-sm" onclick="confirmCrop('hero')"><i class="fa-solid fa-check"></i> 確認裁切並上傳</button>
+                <button class="btn btn-ghost btn-sm" onclick="cancelCrop('hero')">取消</button>
+              </div>
+              <div style="font-size:11px;color:var(--gray-500);margin-top:6px;">拖移、縮放選取要顯示的範圍</div>
+            </div>
+          </div>
+          <div style="margin-top:12px;">
+            <button class="btn btn-primary" onclick="saveHeroImg()"><i class="fa-solid fa-floppy-disk"></i> 儲存首頁圖片</button>
           </div>
         </div>
       </div>
@@ -432,16 +464,17 @@ function doLogout() {
 
 // ── PAGES ──
 function showPage(name) {
-  ['dashboard','products','about','contact','settings'].forEach(function(p) {
+  ['dashboard','homepage','products','about','contact','settings'].forEach(function(p) {
     document.getElementById('page-'+p).style.display = p===name ? '' : 'none';
   });
   document.querySelectorAll('.nav-item').forEach(function(el) {
     el.classList.remove('active');
     if (el.getAttribute('onclick') && el.getAttribute('onclick').includes("'"+name+"'")) el.classList.add('active');
   });
-  var titles = {dashboard:'儀表板',products:'產品管理',about:'關於我們',contact:'聯絡資訊',settings:'系統設定'};
+  var titles = {dashboard:'儀表板',homepage:'首頁設定',products:'產品管理',about:'關於我們',contact:'聯絡資訊',settings:'系統設定'};
   document.getElementById('page-title').textContent = titles[name] || name;
   if (name === 'products') renderProductTable();
+  if (name === 'homepage') loadHomepage();
   if (name === 'about') loadAbout();
   if (name === 'contact') loadContact();
   if (name === 'settings') loadSettings();
@@ -683,7 +716,25 @@ async function uploadImage(blob, filename) {
   return SB_STORAGE + filename;
 }
 
-async function loadAbout() {
+// ── HOMEPAGE ──
+async function loadHomepage() {
+  var {data}=await sb.from('site_settings').select('*').eq('key','hero_img').single();
+  if(data && data.value){
+    document.getElementById('hero-img-preview').innerHTML='<img src="'+data.value+'" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius);"/>';
+  }
+}
+
+async function saveHeroImg() {
+  if(!pendingUpload.hero){ showToast('請先上傳並裁切圖片','error'); return; }
+  var url=await uploadImage(pendingUpload.hero,'hero_'+Date.now()+'.jpg');
+  if(!url) return;
+  pendingUpload.hero=null;
+  await sb.from('site_settings').upsert({key:'hero_img',value:url,updated_at:new Date().toISOString()});
+  document.getElementById('hero-img-preview').innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius);"/>';
+  showToast('首頁圖片已更新！前台重新整理即可看到');
+}
+
+// ── ABOUT ──
   var {data}=await sb.from('site_settings').select('*').in('key',['about_title','about_desc','about_img']);
   if(!data) return;
   var s={};
