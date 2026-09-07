@@ -41,8 +41,8 @@ body{font-family:'Noto Sans TC','Inter',system-ui,sans-serif;background:#f4f6f9;
 .hero::after{content:'';position:absolute;bottom:-100px;right:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(26,86,219,0.07) 0%,transparent 70%);border-radius:50%;}
 .hero-inner{max-width:1160px;margin:0 auto;display:flex;align-items:center;gap:64px;}
 .hero-text{flex:1;}
-.hero-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--blue);letter-spacing:0.1em;text-transform:uppercase;background:var(--blue-light);padding:5px 12px;border-radius:20px;margin-bottom:20px;}
-.hero-title{font-size:clamp(30px,4.5vw,50px);font-weight:700;color:var(--navy);line-height:1.15;margin-bottom:16px;letter-spacing:-0.02em;}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--blue);letter-spacing:0.04em;background:var(--blue-light);padding:4px 12px;border-radius:20px;margin-bottom:14px;}
+.hero-title{font-size:clamp(20px,2.5vw,28px);font-weight:700;color:var(--navy);line-height:1.3;margin-bottom:12px;letter-spacing:-0.01em;}
 .hero-title em{font-style:normal;color:var(--blue);}
 .hero-desc{font-size:15px;color:var(--gray-500);line-height:1.85;max-width:500px;margin-bottom:32px;}
 .hero-btns{display:flex;gap:12px;flex-wrap:wrap;}
@@ -51,20 +51,19 @@ body{font-family:'Noto Sans TC','Inter',system-ui,sans-serif;background:#f4f6f9;
 .btn-primary:hover{background:var(--blue-hover);transform:translateY(-1px);}
 .btn-outline{background:transparent;color:var(--navy);border:1.5px solid var(--gray-300);}
 .btn-outline:hover{border-color:var(--blue);background:var(--blue-light);}
-.hero-stats{display:flex;gap:36px;margin-top:44px;flex-wrap:wrap;padding-top:32px;border-top:1px solid var(--gray-200);}
-.hero-stat-num{font-size:30px;font-weight:700;color:var(--navy);line-height:1;}
-.hero-stat-label{font-size:12px;color:var(--gray-500);margin-top:4px;}
+.hero-stats{display:flex;gap:32px;margin-top:28px;flex-wrap:wrap;padding-top:24px;border-top:1px solid var(--gray-200);}
+.hero-stat-num{font-size:22px;font-weight:700;color:var(--navy);line-height:1;}
+.hero-stat-label{font-size:13px;color:var(--gray-500);margin-top:3px;}
 .hero-visual{flex:0 0 420px;}
-.hero-img{border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-lg);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;}
+.hero-img{overflow:hidden;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;border-radius:12px;}
 .hero-img img{width:100%;height:100%;object-fit:cover;}
 @media(max-width:900px){.hero-inner{flex-direction:column;}.hero-visual{flex:none;width:100%;max-width:480px;}}
 
 /* SECTION */
-.section{padding:72px 24px;}
+.section{padding:60px 24px;}
 .wrap{max-width:1160px;margin:0 auto;}
-.section-label{font-size:15px;font-weight:600;color:var(--blue);margin-bottom:10px;}
-.section-title{font-size:28px;font-weight:700;color:var(--navy);letter-spacing:-0.01em;line-height:1.3;}
-.section-desc{font-size:15px;color:var(--gray-500);margin-top:10px;max-width:560px;line-height:1.85;}
+.section-title{font-size:24px;font-weight:700;color:var(--navy);letter-spacing:-0.01em;line-height:1.3;margin-bottom:10px;}
+.section-desc{font-size:15px;color:var(--gray-500);margin-top:8px;max-width:560px;line-height:1.85;}
 
 /* ABOUT */
 .about-bg{background:var(--white);border-top:1px solid var(--gray-200);border-bottom:1px solid var(--gray-200);}
@@ -151,7 +150,7 @@ body{font-family:'Noto Sans TC','Inter',system-ui,sans-serif;background:#f4f6f9;
 .contact-bg{background:var(--navy);}
 .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start;}
 .contact-hl{font-size:11px;font-weight:600;color:rgba(255,255,255,0.45);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;}
-.contact-title{font-size:28px;font-weight:700;color:#fff;margin-bottom:10px;line-height:1.3;letter-spacing:-0.01em;}
+.contact-title{font-size:24px;font-weight:700;color:#fff;margin-bottom:10px;line-height:1.3;}
 .contact-desc{font-size:14px;color:rgba(255,255,255,0.55);line-height:1.85;margin-bottom:24px;}
 .contact-rows{display:flex;flex-direction:column;gap:12px;}
 .contact-row{display:flex;gap:12px;align-items:center;}
@@ -247,9 +246,8 @@ textarea.form-input{resize:none;height:88px;line-height:1.6;}
         </div>
       </div>
       <div>
-        <div class="section-label">關於致一科技</div>
         <h2 class="section-title" id="about-title">由研發驅動的顯示專家</h2>
-        <p style="font-size:15px;color:var(--gray-500);line-height:1.9;margin-top:12px;" id="about-desc">致一科技由資深研發負責人於 2017 年創立，核心團隊擁有超過 15 年光電顯示產業資歷。專精於 LCD Module 與電容式觸控屏設計開發，整合內外部資源，提供品質第一、顧客滿意的高附加價值產品。</p>
+        <p style="font-size:14px;color:var(--gray-500);line-height:1.85;margin-top:10px;" id="about-desc">致一科技由資深研發負責人於 2017 年創立，核心團隊擁有超過 15 年光電顯示產業資歷。專精於 LCD Module 與電容式觸控屏設計開發，整合內外部資源，提供品質第一、顧客滿意的高附加價值產品。</p>
         <div class="about-points">
           <div class="about-pt">
             <div class="about-pt-icon">🔬</div>
@@ -273,7 +271,6 @@ textarea.form-input{resize:none;height:88px;line-height:1.6;}
 <section class="section products-bg" id="products">
   <div class="wrap">
     <div style="margin-bottom:32px;">
-      <div class="section-label">產品系列</div>
       <h2 class="section-title">顯示模組產品</h2>
       <p class="section-desc">工業等級顯示解決方案，支援寬溫、高亮度、電容觸控等多元規格</p>
     </div>
@@ -297,7 +294,6 @@ textarea.form-input{resize:none;height:88px;line-height:1.6;}
 <section class="section sol-bg" id="solutions">
   <div class="wrap">
     <div style="margin-bottom:36px;">
-      <div class="section-label">應用市場</div>
       <h2 class="section-title">行業解決方案</h2>
       <p class="section-desc">針對不同應用場景提供專屬顯示解決方案</p>
     </div>
@@ -329,7 +325,6 @@ textarea.form-input{resize:none;height:88px;line-height:1.6;}
   <div class="wrap">
     <div class="contact-grid">
       <div>
-        <div class="section-label" style="color:rgba(255,255,255,0.5);">聯絡我們</div>
         <h2 class="contact-title">讓我們討論您的<br/>顯示需求</h2>
         <p class="contact-desc">無論標準規格選型或全客製化開發，我們的團隊都能提供專業建議與快速報價。</p>
         <div class="contact-rows">
