@@ -248,7 +248,7 @@ textarea.inp{resize:none;line-height:1.6;}
       <div id="page-about" style="display:none;">
         <div class="card">
           <div class="card-title"><i class="fa-solid fa-image" style="color:var(--blue);"></i> 關於我們 — 主圖片</div>
-          <div id="about-img-preview" style="background:var(--gray-100);border:1px solid var(--gray-200);border-radius:var(--radius);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;color:var(--gray-300);font-size:13px;margin-bottom:12px;overflow:hidden;max-height:300px;">尚未上傳</div>
+          <div id="about-img-preview" style="background:var(--gray-100);border:1px solid var(--gray-200);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;color:var(--gray-300);font-size:13px;margin-bottom:12px;overflow:hidden;min-height:80px;">尚未上傳</div>
           <div class="img-upload-area" onclick="document.getElementById('about-img-input').click()">
             <i class="fa-solid fa-cloud-arrow-up" style="font-size:28px;color:var(--gray-300);display:block;margin-bottom:8px;"></i>
             <div style="font-size:14px;color:var(--gray-500);">點擊或拖曳上傳關於我們圖片</div>
@@ -637,7 +637,7 @@ function startCrop(input, type) {
   var reader = new FileReader();
   reader.onload = function(e) {
     var prevId = type==='prod' ? 'prod-img-preview' : type+'-img-preview';
-    document.getElementById(prevId).innerHTML = '<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius);"/>';
+    document.getElementById(prevId).innerHTML = '<img src="'+e.target.result+'" style="width:100%;height:auto;display:block;border-radius:var(--radius);"/>';
     pendingUpload[type] = file;
     showToast('圖片已選取，請按儲存上傳');
   };
@@ -680,7 +680,7 @@ async function loadAbout() {
   document.getElementById('about-title').value=s.about_title||'';
   document.getElementById('about-desc').value=s.about_desc||'';
   if(s.about_img){
-    document.getElementById('about-img-preview').innerHTML='<img src="'+s.about_img+'" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius);"/>';
+    document.getElementById('about-img-preview').innerHTML='<img src="'+s.about_img+'" style="width:100%;height:auto;display:block;border-radius:var(--radius);"/>';
   }
 }
 
