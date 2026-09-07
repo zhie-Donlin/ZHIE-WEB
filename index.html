@@ -55,16 +55,16 @@ body{font-family:'Noto Sans TC','Inter',system-ui,sans-serif;background:#f4f6f9;
 .hero-stat-num{font-size:30px;font-weight:700;color:var(--navy);line-height:1;}
 .hero-stat-label{font-size:12px;color:var(--gray-500);margin-top:4px;}
 .hero-visual{flex:0 0 420px;}
-.hero-img{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-lg);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;}
+.hero-img{border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-lg);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;}
 .hero-img img{width:100%;height:100%;object-fit:cover;}
 @media(max-width:900px){.hero-inner{flex-direction:column;}.hero-visual{flex:none;width:100%;max-width:480px;}}
 
 /* SECTION */
 .section{padding:72px 24px;}
 .wrap{max-width:1160px;margin:0 auto;}
-.section-label{font-size:11px;font-weight:600;color:var(--blue);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;}
-.section-title{font-size:clamp(22px,3vw,30px);font-weight:700;color:var(--navy);letter-spacing:-0.01em;}
-.section-desc{font-size:14px;color:var(--gray-500);margin-top:8px;max-width:540px;line-height:1.8;}
+.section-label{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:0.06em;margin-bottom:10px;}
+.section-title{font-size:36px;font-weight:700;color:var(--navy);letter-spacing:-0.02em;line-height:1.2;}
+.section-desc{font-size:15px;color:var(--gray-500);margin-top:12px;max-width:560px;line-height:1.85;}
 
 /* ABOUT */
 .about-bg{background:var(--white);border-top:1px solid var(--gray-200);border-bottom:1px solid var(--gray-200);}
@@ -151,7 +151,7 @@ body{font-family:'Noto Sans TC','Inter',system-ui,sans-serif;background:#f4f6f9;
 .contact-bg{background:var(--navy);}
 .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start;}
 .contact-hl{font-size:11px;font-weight:600;color:rgba(255,255,255,0.45);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;}
-.contact-title{font-size:28px;font-weight:700;color:#fff;margin-bottom:10px;line-height:1.2;}
+.contact-title{font-size:36px;font-weight:700;color:#fff;margin-bottom:10px;line-height:1.2;letter-spacing:-0.02em;}
 .contact-desc{font-size:14px;color:rgba(255,255,255,0.55);line-height:1.85;margin-bottom:24px;}
 .contact-rows{display:flex;flex-direction:column;gap:12px;}
 .contact-row{display:flex;gap:12px;align-items:center;}
@@ -299,6 +299,7 @@ textarea.form-input{resize:none;height:88px;line-height:1.6;}
     <div style="margin-bottom:36px;">
       <div class="section-label">應用市場</div>
       <h2 class="section-title">行業解決方案</h2>
+      <p class="section-desc">針對不同應用場景提供專屬顯示解決方案</p>
     </div>
     <div class="sol-grid">
       <div class="sol-card">
@@ -328,7 +329,7 @@ textarea.form-input{resize:none;height:88px;line-height:1.6;}
   <div class="wrap">
     <div class="contact-grid">
       <div>
-        <div class="contact-hl">聯絡我們</div>
+        <div class="section-label" style="color:rgba(255,255,255,0.5);">聯絡我們</div>
         <h2 class="contact-title">讓我們討論您的<br/>顯示需求</h2>
         <p class="contact-desc">無論標準規格選型或全客製化開發，我們的團隊都能提供專業建議與快速報價。</p>
         <div class="contact-rows">
