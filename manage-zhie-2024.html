@@ -683,48 +683,56 @@ async function uploadImage(blob, filename) {
   return SB_STORAGE + filename;
 }
 
-// ── ABOUT ──
-function loadAbout() {
-  var data = JSON.parse(localStorage.getItem('zhie_about') || '{}');
-  document.getElementById('about-title').value = data.title || '';
-  document.getElementById('about-desc').value = data.desc || '';
-  if (data.img) {
-    document.getElementById('about-img-preview').innerHTML = '<img src="'+data.img+'" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius);"/>';
+async function loadAbout() {
+  var {data}=await sb.from('site_settings').select('*').in('key',['about_title','about_desc','about_img']);
+  if(!data) return;
+  var s={};
+  data.forEach(function(r){s[r.key]=r.value;});
+  document.getElementById('about-title').value=s.about_title||'';
+  document.getElementById('about-desc').value=s.about_desc||'';
+  if(s.about_img){
+    document.getElementById('about-img-preview').innerHTML='<img src="'+s.about_img+'" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius);"/>';
   }
 }
 
 async function saveAbout() {
-  if (pendingUpload.about) {
-    var url = await uploadImage(pendingUpload.about, 'about_'+Date.now()+'.jpg');
-    if (url) {
-      var data = JSON.parse(localStorage.getItem('zhie_about') || '{}');
-      data.img = url;
-      localStorage.setItem('zhie_about', JSON.stringify(data));
-      pendingUpload.about = null;
-    }
+  var imgUrl=null;
+  if(pendingUpload.about){
+    imgUrl=await uploadImage(pendingUpload.about,'about_'+Date.now()+'.jpg');
+    pendingUpload.about=null;
   }
-  var data = JSON.parse(localStorage.getItem('zhie_about') || '{}');
-  data.title = document.getElementById('about-title').value;
-  data.desc = document.getElementById('about-desc').value;
-  localStorage.setItem('zhie_about', JSON.stringify(data));
+  var updates=[
+    {key:'about_title',value:document.getElementById('about-title').value},
+    {key:'about_desc',value:document.getElementById('about-desc').value},
+  ];
+  if(imgUrl) updates.push({key:'about_img',value:imgUrl});
+  for(var u of updates){
+    await sb.from('site_settings').upsert({key:u.key,value:u.value,updated_at:new Date().toISOString()});
+  }
   showToast('關於我們已儲存');
 }
 
-// ── CONTACT ──
-function loadContact() {
-  var data = JSON.parse(localStorage.getItem('zhie_contact') || '{}');
-  document.getElementById('c-email').value = data.email || 'info@zhietech.com';
-  document.getElementById('c-phone').value = data.phone || '';
-  document.getElementById('c-addr').value = data.addr || '台灣';
-  document.getElementById('c-line').value = data.line || '';
+async function loadContact() {
+  var {data}=await sb.from('site_settings').select('*').in('key',['contact_email','contact_phone','contact_addr','contact_line']);
+  if(!data) return;
+  var s={};
+  data.forEach(function(r){s[r.key]=r.value;});
+  document.getElementById('c-email').value=s.contact_email||'info@zhietech.com';
+  document.getElementById('c-phone').value=s.contact_phone||'';
+  document.getElementById('c-addr').value=s.contact_addr||'台灣';
+  document.getElementById('c-line').value=s.contact_line||'';
 }
-function saveContact() {
-  localStorage.setItem('zhie_contact', JSON.stringify({
-    email: document.getElementById('c-email').value,
-    phone: document.getElementById('c-phone').value,
-    addr: document.getElementById('c-addr').value,
-    line: document.getElementById('c-line').value,
-  }));
+
+async function saveContact() {
+  var updates=[
+    {key:'contact_email',value:document.getElementById('c-email').value},
+    {key:'contact_phone',value:document.getElementById('c-phone').value},
+    {key:'contact_addr',value:document.getElementById('c-addr').value},
+    {key:'contact_line',value:document.getElementById('c-line').value},
+  ];
+  for(var u of updates){
+    await sb.from('site_settings').upsert({key:u.key,value:u.value,updated_at:new Date().toISOString()});
+  }
   showToast('聯絡資訊已儲存');
 }
 
