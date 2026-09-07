@@ -735,6 +735,7 @@ async function saveHeroImg() {
 }
 
 // ── ABOUT ──
+async function loadAbout() {
   var {data}=await sb.from('site_settings').select('*').in('key',['about_title','about_desc','about_img']);
   if(!data) return;
   var s={};
@@ -757,9 +758,9 @@ async function saveAbout() {
     {key:'about_desc',value:document.getElementById('about-desc').value},
   ];
   if(imgUrl) updates.push({key:'about_img',value:imgUrl});
-  for(var u of updates){
-    await sb.from('site_settings').upsert({key:u.key,value:u.value,updated_at:new Date().toISOString()});
-  }
+  await Promise.all(updates.map(function(u){
+    return sb.from('site_settings').upsert({key:u.key,value:u.value,updated_at:new Date().toISOString()});
+  }));
   showToast('關於我們已儲存');
 }
 
@@ -781,9 +782,9 @@ async function saveContact() {
     {key:'contact_addr',value:document.getElementById('c-addr').value},
     {key:'contact_line',value:document.getElementById('c-line').value},
   ];
-  for(var u of updates){
-    await sb.from('site_settings').upsert({key:u.key,value:u.value,updated_at:new Date().toISOString()});
-  }
+  await Promise.all(updates.map(function(u){
+    return sb.from('site_settings').upsert({key:u.key,value:u.value,updated_at:new Date().toISOString()});
+  }));
   showToast('聯絡資訊已儲存');
 }
 
