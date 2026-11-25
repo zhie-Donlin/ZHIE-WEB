@@ -7,6 +7,7 @@
 <link rel="icon" type="image/png" href="logo.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="site-schema.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
@@ -57,8 +58,10 @@ body{font-family:'Noto Sans TC','Inter',system-ui,sans-serif;background:#f4f6f9;
 .hero-stat-num{font-size:22px;font-weight:700;color:var(--navy);line-height:1;}
 .hero-stat-label{font-size:13px;color:var(--gray-500);margin-top:3px;}
 .hero-visual{flex:0 0 560px;}
-.hero-img{overflow:hidden;border-radius:12px;background:var(--gray-100);}
-.hero-img img{width:100%;height:auto;display:block;object-fit:contain;}
+.hero-img{overflow:hidden;border-radius:12px;background:var(--gray-100);position:relative;min-height:260px;display:flex;align-items:center;justify-content:center;}
+.hero-img img{width:100%;height:auto;display:block;object-fit:contain;opacity:0;transition:opacity 0.25s;}
+.hero-img img.loaded{opacity:1;}
+.hero-img-ph{display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--gray-300);font-size:12px;text-align:center;padding:40px;}
 @media(max-width:900px){.hero-inner{flex-direction:column;}.hero-visual{flex:none;width:100%;max-width:480px;}}
 
 /* SECTION */
@@ -151,6 +154,16 @@ body{font-family:'Noto Sans TC','Inter',system-ui,sans-serif;background:#f4f6f9;
 .sol-tag{font-size:11px;padding:3px 9px;border-radius:4px;background:var(--blue-light);color:var(--blue);}
 @media(max-width:768px){.sol-grid{grid-template-columns:1fr;}}
 
+/* GALLERY 公司環境 */
+.gal-bg{background:var(--gray-50);}
+.gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-top:28px;}
+.gal-item{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius-lg);overflow:hidden;}
+.gal-item img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;}
+.gal-cap{padding:10px 14px;font-size:13px;color:var(--gray-700);}
+.map-box{margin-top:18px;border-radius:var(--radius);overflow:hidden;border:1px solid rgba(255,255,255,0.15);}
+.map-box iframe{width:100%;height:220px;border:0;display:block;}
+.hp-field{position:absolute;left:-9999px;opacity:0;height:0;width:0;}
+
 /* CONTACT */
 .contact-bg{background:var(--navy);}
 .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start;}
@@ -228,21 +241,25 @@ textarea.form-input{resize:none;height:88px;line-height:1.6;}
 </head>
 <body>
 
+<!-- 說明:頁面上所有文字/圖片都由後台設定(site_settings)控制,預設值在 site-schema.js。
+     data-k="key" = 這裡的文字會被後台設定取代。要新增可改項目,請先改 site-schema.js。 -->
+
 <!-- NAV -->
 <nav class="nav">
   <div class="nav-inner">
     <a href="#" class="nav-logo">
-      <img src="logo.png" alt="ZHIE"/>
+      <img src="logo.png" id="logo-img" alt="ZHIE"/>
       <div class="nav-logo-text">
-        <span class="nav-logo-text-zh">致一科技有限公司</span>
-        <span class="nav-logo-text-en">ZHIE CO., LTD.</span>
+        <span class="nav-logo-text-zh" data-k="company_zh"></span>
+        <span class="nav-logo-text-en" data-k="company_en"></span>
       </div>
     </a>
     <div class="nav-links" id="navLinks">
-      <a href="#about" class="nav-link">關於我們</a>
-      <a href="#products" class="nav-link">產品</a>
-      <a href="#solutions" class="nav-link">解決方案</a>
-      <a href="#contact" class="nav-cta">聯絡我們</a>
+      <a href="#about" class="nav-link" data-k="nav_about"></a>
+      <a href="#products" class="nav-link" data-k="nav_products"></a>
+      <a href="#solutions" class="nav-link" data-k="nav_solutions"></a>
+      <a href="#gallery" class="nav-link" id="nav-gallery" style="display:none;" data-k="nav_gallery"></a>
+      <a href="#contact" class="nav-cta" data-k="nav_contact"></a>
     </div>
     <button class="nav-toggle" id="navToggle" aria-label="開啟選單" onclick="toggleNav()">
       <span></span><span></span><span></span>
@@ -254,31 +271,22 @@ textarea.form-input{resize:none;height:88px;line-height:1.6;}
 <section class="hero">
   <div class="hero-inner">
     <div class="hero-text">
-      <div class="hero-badge">Since 2017 · LCD Module Expert</div>
-      <h1 class="hero-title">專業顯示模組<br/><em>研發設計夥伴</em></h1>
-      <p class="hero-desc">致一科技深耕 LCD Module 與電容式觸控屏設計開發，擁有超過 15 年光電產業經驗，為工業、醫療、車載等領域提供高品質客製化顯示解決方案。</p>
+      <div class="hero-badge" data-k="hero_badge"></div>
+      <h1 class="hero-title"><span data-k="hero_title_1"></span><br/><em data-k="hero_title_2"></em></h1>
+      <p class="hero-desc" data-k="hero_desc"></p>
       <div class="hero-btns">
-        <a href="#products" class="btn btn-primary">瀏覽產品</a>
-        <a href="#contact" class="btn btn-outline">詢價聯繫</a>
+        <a href="#products" class="btn btn-primary" data-k="hero_btn1"></a>
+        <a href="#contact" class="btn btn-outline" data-k="hero_btn2"></a>
       </div>
-      <div class="hero-stats">
-        <div class="hero-stat">
-          <div class="hero-stat-num">15+</div>
-          <div class="hero-stat-label">年光電產業經驗</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-num">100+</div>
-          <div class="hero-stat-label">顯示模組型號</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-num">100%</div>
-          <div class="hero-stat-label">客製化服務</div>
-        </div>
-      </div>
+      <div class="hero-stats" id="hero-stats"></div>
     </div>
     <div class="hero-visual">
       <div class="hero-img">
-        <img id="hero-img" src="https://zyzmadwlvlgoamppaosg.supabase.co/storage/v1/object/public/products/12_1inch.jpg" alt="ZHIE TFT Display Module" style="width:100%;height:100%;object-fit:cover;"/>
+        <div class="hero-img-ph" id="hero-img-ph">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect x="4" y="8" width="40" height="26" rx="3" stroke="#c4cce0" stroke-width="1.5" fill="none"/><rect x="8" y="12" width="32" height="18" rx="1.5" fill="#edf0f5"/></svg>
+          <span data-k="hero_img_ph"></span>
+        </div>
+        <img id="hero-img" alt="" style="width:100%;height:100%;object-fit:cover;"/>
       </div>
     </div>
   </div>
@@ -291,28 +299,24 @@ textarea.form-input{resize:none;height:88px;line-height:1.6;}
       <div class="about-img-wrap" id="about-img" >
         <div class="about-img-ph" id="about-img-ph">
           <svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect x="4" y="8" width="40" height="26" rx="3" stroke="#c4cce0" stroke-width="1.5" fill="none"/><rect x="8" y="12" width="32" height="18" rx="1.5" fill="#edf0f5"/></svg>
-          <span>關於我們圖片<br/>可由後台上傳</span>
+          <span data-k="about_img_ph"></span>
         </div>
       </div>
       <div>
-        <h2 class="section-title" id="about-title">由研發驅動的顯示專家</h2>
-        <p style="font-size:14px;color:var(--gray-500);line-height:1.85;margin-top:10px;" id="about-desc">致一科技由資深研發負責人於 2017 年創立，核心團隊擁有超過 15 年光電顯示產業資歷。專精於 LCD Module 與電容式觸控屏設計開發，整合內外部資源，提供品質第一、顧客滿意的高附加價值產品。</p>
-        <div class="about-pts-grid">
-          <div class="about-pt">
-            <div class="about-pt-icon">🔬</div>
-            <div><div class="about-pt-title">研發能力</div><div class="about-pt-desc">從規格確認到量產交貨，提供完整一站式顯示解決方案</div></div>
-          </div>
-          <div class="about-pt">
-            <div class="about-pt-icon">⚙️</div>
-            <div><div class="about-pt-title">客製化設計</div><div class="about-pt-desc">Mono LCM 及 TFT 彩色顯示模組，含周邊電子電路設計</div></div>
-          </div>
-          <div class="about-pt">
-            <div class="about-pt-icon">🤝</div>
-            <div><div class="about-pt-title">品質保證</div><div class="about-pt-desc">嚴格品質管控，彈性生產，即時交貨</div></div>
-          </div>
-        </div>
+        <h2 class="section-title" id="about-title" data-k="about_title"></h2>
+        <p style="font-size:14px;color:var(--gray-500);line-height:1.85;margin-top:10px;" id="about-desc" data-k="about_desc"></p>
+        <div class="about-pts-grid" id="about-points"></div>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- GALLERY 公司環境(沒照片時整區隱藏) -->
+<section class="section gal-bg" id="gallery" style="display:none;">
+  <div class="wrap">
+    <h2 class="section-title" data-k="gallery_title"></h2>
+    <p class="section-desc" id="gallery-desc" data-k="gallery_desc"></p>
+    <div class="gal-grid" id="gallery-grid"></div>
   </div>
 </section>
 
@@ -320,20 +324,14 @@ textarea.form-input{resize:none;height:88px;line-height:1.6;}
 <section class="section products-bg" id="products">
   <div class="wrap">
     <div style="margin-bottom:32px;">
-      <h2 class="section-title">顯示模組產品</h2>
-      <p class="section-desc">工業等級顯示解決方案，支援寬溫、高亮度、電容觸控等多元規格</p>
+      <h2 class="section-title" data-k="prod_title"></h2>
+      <p class="section-desc" data-k="prod_desc"></p>
     </div>
-    <div class="cat-tabs">
-      <button class="cat-tab active" onclick="filterCat('')">全部</button>
-      <button class="cat-tab" onclick="filterCat('TFT彩色')">TFT 彩色</button>
-      <button class="cat-tab" onclick="filterCat('MONO LCM')">MONO LCM</button>
-      <button class="cat-tab" onclick="filterCat('觸控模組')">觸控模組</button>
-      <button class="cat-tab" onclick="filterCat('客製化')">客製化</button>
-    </div>
+    <div class="cat-tabs" id="cat-tabs"></div>
     <div id="product-area">
       <div style="text-align:center;padding:40px 0;">
         <div class="spinner"></div>
-        <div style="margin-top:12px;color:var(--gray-500);font-size:14px;">載入中...</div>
+        <div style="margin-top:12px;color:var(--gray-500);font-size:14px;" data-k="txt_loading"></div>
       </div>
     </div>
   </div>
@@ -343,29 +341,10 @@ textarea.form-input{resize:none;height:88px;line-height:1.6;}
 <section class="section sol-bg" id="solutions">
   <div class="wrap">
     <div style="margin-bottom:36px;">
-      <h2 class="section-title">行業解決方案</h2>
-      <p class="section-desc">針對不同應用場景提供專屬顯示解決方案</p>
+      <h2 class="section-title" data-k="sol_title"></h2>
+      <p class="section-desc" data-k="sol_desc"></p>
     </div>
-    <div class="sol-grid">
-      <div class="sol-card">
-        <div class="sol-icon">🏭</div>
-        <div class="sol-title">工業自動化</div>
-        <div class="sol-desc">HMI 面板、PLC 控制器、工業儀表、設備監控介面，支援寬溫設計 -40°C～85°C</div>
-        <div class="sol-tags"><span class="sol-tag">HMI 面板</span><span class="sol-tag">工業儀表</span><span class="sol-tag">寬溫設計</span></div>
-      </div>
-      <div class="sol-card">
-        <div class="sol-icon">🏥</div>
-        <div class="sol-title">醫療設備</div>
-        <div class="sol-desc">生命體征監測、手術設備、可攜式醫療儀器，符合高可靠性與抗干擾需求</div>
-        <div class="sol-tags"><span class="sol-tag">生命監測</span><span class="sol-tag">醫療顯示</span><span class="sol-tag">高可靠性</span></div>
-      </div>
-      <div class="sol-card">
-        <div class="sol-icon">🚗</div>
-        <div class="sol-title">車載系統</div>
-        <div class="sol-desc">儀表板顯示、車載娛樂、導航系統，符合車規級嚴苛環境需求</div>
-        <div class="sol-tags"><span class="sol-tag">儀表板</span><span class="sol-tag">車載娛樂</span><span class="sol-tag">導航系統</span></div>
-      </div>
-    </div>
+    <div class="sol-grid" id="sol-grid"></div>
   </div>
 </section>
 
@@ -374,21 +353,20 @@ textarea.form-input{resize:none;height:88px;line-height:1.6;}
   <div class="wrap">
     <div class="contact-grid">
       <div>
-        <h2 class="contact-title">如有產品規格等相關問題，歡迎聯繫我們</h2>
-        <p class="contact-desc">無論標準規格選型或全客製化開發，我們的團隊都能提供專業建議與快速報價。</p>
-        <div class="contact-rows">
-          <div class="contact-row"><div class="c-icon">📧</div><div class="c-text" id="c-email">info@zhietech.com</div></div>
-          <div class="contact-row"><div class="c-icon">🌐</div><div class="c-text">www.zhietech.com</div></div>
-          <div class="contact-row"><div class="c-icon">📍</div><div class="c-text" id="c-addr">台灣</div></div>
-        </div>
+        <h2 class="contact-title" data-k="contact_title"></h2>
+        <p class="contact-desc" data-k="contact_desc"></p>
+        <div class="contact-rows" id="contact-rows"></div>
+        <div class="map-box" id="map-box" style="display:none;"></div>
       </div>
       <div class="contact-form-box">
-        <div class="form-title">快速詢價</div>
-        <div class="form-group"><label class="form-label">公司名稱</label><input class="form-input" placeholder="您的公司名稱" id="f-company"/></div>
-        <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="email@company.com" id="f-email"/></div>
-        <div class="form-group"><label class="form-label">需求說明</label><textarea class="form-input" placeholder="請描述您的顯示需求，例如：尺寸、解析度、觸控、數量..." id="f-msg"></textarea></div>
-        <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="submitForm()">送出詢價</button>
-        <div id="f-result" style="display:none;margin-top:12px;text-align:center;font-size:13px;color:var(--blue);">✅ 已收到您的詢價，我們將盡快與您聯繫！</div>
+        <div class="form-title" data-k="form_title"></div>
+        <div class="form-group"><label class="form-label" data-k="form_company"></label><input class="form-input" id="f-company" data-ph="form_company_ph"/></div>
+        <div class="form-group"><label class="form-label" data-k="form_email"></label><input class="form-input" type="email" id="f-email" data-ph="form_email_ph"/></div>
+        <div class="form-group"><label class="form-label" data-k="form_msg"></label><textarea class="form-input" id="f-msg" data-ph="form_msg_ph"></textarea></div>
+        <input class="hp-field" type="text" id="f-hp" tabindex="-1" autocomplete="off" aria-hidden="true"/>
+        <button class="btn btn-primary" id="f-btn" style="width:100%;justify-content:center;" onclick="submitForm()" data-k="form_btn"></button>
+        <div id="f-result" style="display:none;margin-top:12px;text-align:center;font-size:13px;color:var(--blue);" data-k="form_ok"></div>
+        <div id="f-error" style="display:none;margin-top:12px;text-align:center;font-size:13px;color:#c0392b;" data-k="form_fail"></div>
       </div>
     </div>
   </div>
@@ -397,11 +375,11 @@ textarea.form-input{resize:none;height:88px;line-height:1.6;}
 <!-- FOOTER -->
 <footer class="footer">
   <div class="footer-inner">
-    <div class="footer-copy">© 2025 ZHIE CO., LTD. 致一科技有限公司</div>
+    <div class="footer-copy" data-k="footer_copy"></div>
     <div class="footer-links">
-      <a href="#about" class="footer-link">關於我們</a>
-      <a href="#products" class="footer-link">產品</a>
-      <a href="#contact" class="footer-link">聯絡</a>
+      <a href="#about" class="footer-link" data-k="footer_about"></a>
+      <a href="#products" class="footer-link" data-k="footer_products"></a>
+      <a href="#contact" class="footer-link" data-k="footer_contact"></a>
     </div>
   </div>
 </footer>
@@ -422,8 +400,8 @@ textarea.form-input{resize:none;height:88px;line-height:1.6;}
       <div class="spec-grid" id="m-specs"></div>
     </div>
     <div class="modal-actions">
-      <a href="#contact" class="btn btn-primary" onclick="closeModal()" style="flex:1;justify-content:center;">詢價這款產品</a>
-      <button class="btn btn-outline" onclick="closeModal()" style="flex:1;justify-content:center;">關閉</button>
+      <a href="#contact" class="btn btn-primary" onclick="closeModal()" style="flex:1;justify-content:center;" data-k="modal_btn_inquiry"></a>
+      <button class="btn btn-outline" onclick="closeModal()" style="flex:1;justify-content:center;" data-k="modal_btn_close"></button>
     </div>
   </div>
 </div>
@@ -434,52 +412,57 @@ const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZ
 const SB_STORAGE = SB_URL+'/storage/v1/object/public/products/';
 const sb=supabase.createClient(SB_URL,SB_KEY);
 
-// 尺寸對應照片
-const SIZE_IMGS={
-  '1':'',
-  '2':'2inch.jpg',
-  '3.5':'3_5inch.jpg',
-  '4.3':'4_3inch.jpg',
-  '5':'5inch.jpg',
-  '5.7':'5_7inch.jpg',
-  '6.86':'6_86inch.jpg',
-  '7':'7inch.jpg',
-  '8':'8inch.jpg',
-  '10.1':'10_1inch.jpg',
-  '12.1':'12_1inch.jpg',
-  '15.6':'',
-  '高亮':''
+// 各尺寸預設照片(後台「尺寸照片」有設定就以後台為準,值為完整網址)
+const SIZE_IMGS_DEFAULT={
+  '1':'','2':'2inch.jpg','3.5':'3_5inch.jpg','4.3':'4_3inch.jpg','5':'5inch.jpg','5.7':'5_7inch.jpg',
+  '6.86':'6_86inch.jpg','7':'7inch.jpg','8':'8inch.jpg','10.1':'10_1inch.jpg','12.1':'12_1inch.jpg','15.6':'','高亮':''
 };
+var SIZE_IMGS_OVERRIDE={};
+function sizeImgUrl(size){
+  var o=SIZE_IMGS_OVERRIDE[size];
+  if(o) return o;
+  var f=SIZE_IMGS_DEFAULT[size]||'';
+  return f?SB_STORAGE+f:'';
+}
+
+var CFG=zhieMerge({});   // 網站設定(預設值 + 後台資料)
+function T(k){return CFG[k]==null?'':CFG[k];}
 
 var allProducts=[];
 var currentCat='';
 var currentView='sizes'; // 'sizes' or 'products'
 var currentSize='';
 
+function noImgSvg(sz){return '<svg width="'+sz+'" height="'+sz+'" viewBox="0 0 40 40" fill="none"><rect x="3" y="7" width="34" height="22" rx="2.5" stroke="#c4cce0" stroke-width="1.5" fill="none"/><rect x="7" y="11" width="26" height="14" rx="1.5" fill="#edf0f5"/></svg>';}
+
 async function loadProducts(){
   var {data,error}=await sb.from('products').select('*').eq('status','active').order('size_inch').order('model_name');
   if(error||!data){
-    document.getElementById('product-area').innerHTML='<div class="empty">載入失敗，請重新整理</div>';
+    document.getElementById('product-area').innerHTML='<div class="empty">'+esc(T('txt_load_fail'))+'</div>';
     return;
   }
   allProducts=data;
   renderSizes();
 }
 
-function filterCat(cat){
-  currentCat=cat;
+function renderCatTabs(){
+  var h='<button class="cat-tab'+(currentCat===''?' active':'')+'" onclick="filterCat(\'\')">'+esc(T('prod_cat_all'))+'</button>';
+  (T('prod_cats')||[]).forEach(function(c,i){
+    h+='<button class="cat-tab'+(currentCat===c.value?' active':'')+'" onclick="filterCat('+i+')">'+esc(c.name)+'</button>';
+  });
+  document.getElementById('cat-tabs').innerHTML=h;
+}
+
+function filterCat(i){
+  currentCat=(i===''||i==null)?'':(T('prod_cats')[i]||{}).value||'';
   currentView='sizes';
   currentSize='';
-  document.querySelectorAll('.cat-tab').forEach(function(b){
-    b.classList.toggle('active',b.textContent.trim()===(cat||'全部'));
-  });
+  renderCatTabs();
   renderSizes();
 }
 
 function renderSizes(){
   var filtered=allProducts.filter(function(p){return !currentCat||p.category===currentCat;});
-  
-  // 群組化尺寸
   var sizeMap={};
   filtered.forEach(function(p){
     var s=p.size_inch||'其他';
@@ -488,32 +471,25 @@ function renderSizes(){
     if(p.interface) p.interface.split('/').forEach(function(i){sizeMap[s].interfaces.add(i.trim());});
     if(p.tp&&p.tp!=='NA') sizeMap[s].tps.add(p.tp);
   });
-
   var sizes=Object.values(sizeMap).sort(function(a,b){return parseFloat(a.size)-parseFloat(b.size);});
-
   if(!sizes.length){
-    document.getElementById('product-area').innerHTML='<div class="empty">此分類暫無產品</div>';
+    document.getElementById('product-area').innerHTML='<div class="empty">'+esc(T('txt_empty'))+'</div>';
     return;
   }
-
   var html='<div class="size-grid">';
   sizes.forEach(function(sg){
-    var imgFile=SIZE_IMGS[sg.size]||'';
+    var imgFile=sizeImgUrl(sg.size);
     var imgHtml=imgFile
-      ?'<img src="'+SB_STORAGE+imgFile+'" alt="'+sg.size+'吋" loading="lazy"/>'
-      :'<div class="size-card-img-ph"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><rect x="3" y="7" width="34" height="22" rx="2.5" stroke="#c4cce0" stroke-width="1.5" fill="none"/><rect x="7" y="11" width="26" height="14" rx="1.5" fill="#edf0f5"/></svg><span style="font-size:11px;color:#c4cce0;">暫無圖片</span></div>';
-    
+      ?'<img src="'+esc(imgFile)+'" alt="'+esc(sg.size)+esc(T('txt_inch'))+'" loading="lazy"/>'
+      :'<div class="size-card-img-ph">'+noImgSvg(40)+'<span style="font-size:11px;color:#c4cce0;">'+esc(T('txt_no_img'))+'</span></div>';
     var tags='';
-    var tpArr=[...sg.tps].slice(0,2);
-    tpArr.forEach(function(t){tags+='<span class="size-tag blue">'+esc(t)+'</span>';});
-    var ifArr=[...sg.interfaces].slice(0,2);
-    ifArr.forEach(function(i){tags+='<span class="size-tag">'+esc(i)+'</span>';});
-
+    [...sg.tps].slice(0,2).forEach(function(t){tags+='<span class="size-tag blue">'+esc(t)+'</span>';});
+    [...sg.interfaces].slice(0,2).forEach(function(i){tags+='<span class="size-tag">'+esc(i)+'</span>';});
     html+='<div class="size-card" onclick="showProducts(\''+esc(sg.size)+'\')">'
       +'<div class="size-card-img">'+imgHtml+'</div>'
       +'<div class="size-card-body">'
-      +'<div class="size-card-inch">'+esc(sg.size)+' 吋</div>'
-      +'<div class="size-card-count">'+sg.products.length+' 款型號</div>'
+      +'<div class="size-card-inch">'+esc(sg.size)+' '+esc(T('txt_inch'))+'</div>'
+      +'<div class="size-card-count">'+sg.products.length+' '+esc(T('txt_models'))+'</div>'
       +'<div class="size-card-tags">'+tags+'</div>'
       +'</div></div>';
   });
@@ -528,29 +504,26 @@ function showProducts(size){
   var filtered=allProducts.filter(function(p){
     return p.size_inch===size&&(!currentCat||p.category===currentCat);
   });
-
-  var imgFile=SIZE_IMGS[size]||'';
+  var imgFile=sizeImgUrl(size);
   var imgHtml=imgFile
-    ?'<img src="'+SB_STORAGE+imgFile+'" alt="'+size+'吋" style="width:60px;height:44px;object-fit:cover;border-radius:6px;margin-right:8px;vertical-align:middle;"/>'
+    ?'<img src="'+esc(imgFile)+'" alt="'+esc(size)+esc(T('txt_inch'))+'" style="width:60px;height:44px;object-fit:cover;border-radius:6px;margin-right:8px;vertical-align:middle;"/>'
     :'';
-
   var html='<div class="product-list-header">'
-    +'<button class="back-btn" onclick="renderSizes()">← 返回所有尺寸</button>'
+    +'<button class="back-btn" onclick="renderSizes()">'+esc(T('txt_back'))+'</button>'
     +'<span style="color:var(--gray-300);">|</span>'
     +imgHtml
-    +'<span class="product-list-title">'+esc(size)+' 吋</span>'
-    +'<span class="product-list-count">（'+filtered.length+' 款）</span>'
+    +'<span class="product-list-title">'+esc(size)+' '+esc(T('txt_inch'))+'</span>'
+    +'<span class="product-list-count">（'+filtered.length+' '+esc(T('txt_count_unit'))+'）</span>'
     +'</div>'
     +'<div class="prod-table-wrap">'
     +'<table class="prod-table">'
     +'<thead><tr>'
-    +'<th>型號</th><th>解析度</th><th>觸控</th><th>亮度</th><th>介面</th><th>溫度範圍</th><th></th>'
+    +'<th>'+esc(T('th_model'))+'</th><th>'+esc(T('th_resolution'))+'</th><th>'+esc(T('th_tp'))+'</th><th>'+esc(T('th_brightness'))+'</th><th>'+esc(T('th_interface'))+'</th><th>'+esc(T('th_temp'))+'</th><th></th>'
     +'</tr></thead><tbody>';
-
   filtered.forEach(function(p){
     var tpBadge=p.tp&&p.tp!=='NA'
       ?'<span class="tp-badge">'+esc(p.tp)+'</span>'
-      :'<span class="tp-badge tp-none">無</span>';
+      :'<span class="tp-badge tp-none">'+esc(T('txt_tp_none'))+'</span>';
     html+='<tr onclick="openModal(\''+p.id+'\')">'
       +'<td><span class="prod-model">'+esc(p.model_name)+'</span></td>'
       +'<td>'+esc(p.resolution||'—')+'</td>'
@@ -558,7 +531,7 @@ function showProducts(size){
       +'<td>'+(p.brightness?esc(p.brightness)+' nits':'—')+'</td>'
       +'<td style="font-size:12px;">'+esc(p.interface||'—')+'</td>'
       +'<td style="font-size:12px;">'+esc(p.op_temp||'—')+'°C</td>'
-      +'<td style="color:var(--blue);font-size:12px;">詳細 →</td>'
+      +'<td style="color:var(--blue);font-size:12px;">'+esc(T('txt_detail'))+'</td>'
       +'</tr>';
   });
   html+='</tbody></table></div>';
@@ -568,27 +541,26 @@ function showProducts(size){
 function openModal(id){
   var p=allProducts.find(function(x){return x.id===id;});
   if(!p) return;
-  var imgFile=SIZE_IMGS[p.size_inch]||'';
+  var imgFile=p.image_url||sizeImgUrl(p.size_inch);
   document.getElementById('m-img').innerHTML=imgFile
-    ?'<img src="'+SB_STORAGE+imgFile+'" alt="'+esc(p.model_name)+'" style="max-width:160px;max-height:160px;object-fit:contain;"/>'
-    :'<div class="modal-img-ph"><svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect x="4" y="8" width="40" height="26" rx="3" stroke="#c4cce0" stroke-width="1.5" fill="none"/><rect x="8" y="12" width="32" height="18" rx="1.5" fill="#edf0f5"/></svg><span>暫無圖片</span></div>';
+    ?'<img src="'+esc(imgFile)+'" alt="'+esc(p.model_name)+'" style="max-width:160px;max-height:160px;object-fit:contain;"/>'
+    :'<div class="modal-img-ph">'+noImgSvg(48)+'<span>'+esc(T('txt_no_img'))+'</span></div>';
   document.getElementById('m-model').textContent=p.model_name;
-  document.getElementById('m-title').textContent=(p.panel_size?p.panel_size+'"':p.size_inch+'"')+' '+(p.category||'TFT彩色')+' 顯示模組';
+  document.getElementById('m-title').textContent=(p.panel_size?p.panel_size+'"':p.size_inch+'"')+' '+(p.category||'TFT彩色')+' '+T('modal_suffix');
   document.getElementById('m-tags').innerHTML=p.tp&&p.tp!=='NA'?'<span class="tp-badge" style="margin-top:8px;display:inline-block;">'+esc(p.tp)+'</span>':'';
-  
   var specs=[
-    ['Panel Size',p.panel_size?p.panel_size+'"':null],
-    ['解析度',p.resolution],
-    ['灰階',p.gray_scale],
-    ['Outline',p.outline_mm?p.outline_mm+' mm':null],
-    ['Active Area',p.active_area_mm?p.active_area_mm+' mm':null],
-    ['亮度',p.brightness?p.brightness+' nits':null],
-    ['背光條件',p.backlight_condition],
-    ['Driver IC',p.driver_ic],
-    ['Interface',p.interface],
-    ['Pin Out',p.pin_out],
-    ['操作溫度',p.op_temp?p.op_temp+' °C':null],
-    ['備註',p.note||null],
+    [T('sp_panel'),p.panel_size?p.panel_size+'"':null],
+    [T('sp_resolution'),p.resolution],
+    [T('sp_gray'),p.gray_scale],
+    [T('sp_outline'),p.outline_mm?p.outline_mm+' mm':null],
+    [T('sp_active'),p.active_area_mm?p.active_area_mm+' mm':null],
+    [T('sp_brightness'),p.brightness?p.brightness+' nits':null],
+    [T('sp_backlight'),p.backlight_condition],
+    [T('sp_driver'),p.driver_ic],
+    [T('sp_interface'),p.interface],
+    [T('sp_pin'),p.pin_out],
+    [T('sp_temp'),p.op_temp?p.op_temp+' °C':null],
+    [T('sp_note'),p.note||null],
   ];
   document.getElementById('m-specs').innerHTML=specs.filter(function(s){return s[1];}).map(function(s){
     return '<div class="spec-item"><div class="spec-label">'+esc(s[0])+'</div><div class="spec-val">'+esc(s[1])+'</div></div>';
@@ -602,14 +574,33 @@ function closeModal(){
   document.body.style.overflow='';
 }
 
-function submitForm(){
+// 詢價:寫入資料庫 inquiries 表(後台「詢價收件」可看),訪客只能新增、不能讀取
+var _sending=false;
+async function submitForm(){
+  if(_sending) return;
   var email=document.getElementById('f-email').value.trim();
-  if(!email){alert('請填入 Email');return;}
+  document.getElementById('f-result').style.display='none';
+  document.getElementById('f-error').style.display='none';
+  if(!email){alert(T('form_need_email'));return;}
+  if(document.getElementById('f-hp').value){ // 機器人填了隱藏欄位:假裝成功、不送出
+    document.getElementById('f-result').style.display='block';return;
+  }
+  _sending=true;
+  var btn=document.getElementById('f-btn');btn.disabled=true;
+  var row={
+    company:document.getElementById('f-company').value.trim().slice(0,200),
+    email:email.slice(0,200),
+    message:document.getElementById('f-msg').value.trim().slice(0,4000),
+    notify_to:T('inquiry_to')
+  };
+  var r=await sb.from('inquiries').insert(row);
+  _sending=false;btn.disabled=false;
+  if(r.error){document.getElementById('f-error').style.display='block';return;}
   document.getElementById('f-result').style.display='block';
   ['f-company','f-email','f-msg'].forEach(function(id){document.getElementById(id).value='';});
 }
 
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 function toggleNav(){
   var nav=document.getElementById('navLinks');
@@ -626,29 +617,82 @@ function setupNav(){
   });
 }
 
+// 依 CFG 把所有文字、圖片、清單畫到頁面上
+function applyConfig(){
+  document.querySelectorAll('[data-k]').forEach(function(el){el.textContent=T(el.getAttribute('data-k'));});
+  document.querySelectorAll('[data-ph]').forEach(function(el){el.placeholder=T(el.getAttribute('data-ph'));});
+  document.title=T('site_title');
+  var fav=document.querySelector('link[rel="icon"]');
+  if(fav&&T('site_favicon')) fav.href=T('site_favicon');
+  var lg=document.getElementById('logo-img');
+  if(lg){ if(T('logo_img')) lg.src=T('logo_img'); lg.alt=T('alt_logo'); }
+
+  // 首頁亮點
+  document.getElementById('hero-stats').innerHTML=(T('hero_stats')||[]).map(function(s){
+    return '<div class="hero-stat"><div class="hero-stat-num">'+esc(s.num)+'</div><div class="hero-stat-label">'+esc(s.label)+'</div></div>';
+  }).join('');
+  // 首頁大圖
+  var h=document.getElementById('hero-img'),ph=document.getElementById('hero-img-ph');
+  h.alt=T('alt_hero');
+  if(T('hero_img')){
+    h.onload=function(){h.classList.add('loaded');if(ph)ph.style.display='none';};
+    h.src=T('hero_img');
+  }
+  // 關於我們
+  var pts=document.getElementById('about-points');
+  pts.innerHTML=(T('about_points')||[]).map(function(p){
+    return '<div class="about-pt"><div class="about-pt-icon">'+esc(p.icon)+'</div><div><div class="about-pt-title">'+esc(p.title)+'</div><div class="about-pt-desc">'+esc(p.desc)+'</div></div></div>';
+  }).join('');
+  if(T('about_img')){
+    var b=document.getElementById('about-img');
+    var sc=parseFloat(T('about_img_scale'))||1, tx=parseFloat(T('about_img_x'))||0, ty=parseFloat(T('about_img_y'))||0;
+    b.innerHTML='<img src="'+esc(T('about_img'))+'" alt="'+esc(T('alt_about'))+'" style="position:absolute;top:50%;left:50%;transform:translate(calc(-50% + '+tx+'px), calc(-50% + '+ty+'px)) scale('+sc+');transform-origin:center;width:100%;"/>';
+  }
+  // 公司環境照片
+  var gal=(T('gallery_imgs')||[]).filter(function(g){return g&&g.img;});
+  document.getElementById('gallery').style.display=gal.length?'':'none';
+  document.getElementById('nav-gallery').style.display=gal.length?'':'none';
+  document.getElementById('gallery-desc').style.display=T('gallery_desc')?'':'none';
+  document.getElementById('gallery-grid').innerHTML=gal.map(function(g){
+    return '<div class="gal-item"><img src="'+esc(g.img)+'" alt="'+esc(g.caption||T('gallery_title'))+'" loading="lazy"/>'+(g.caption?'<div class="gal-cap">'+esc(g.caption)+'</div>':'')+'</div>';
+  }).join('');
+  // 解決方案
+  document.getElementById('sol-grid').innerHTML=(T('sol_cards')||[]).map(function(c){
+    var tags=String(c.tags||'').split(/[,，]/).map(function(t){return t.trim();}).filter(Boolean)
+      .map(function(t){return '<span class="sol-tag">'+esc(t)+'</span>';}).join('');
+    return '<div class="sol-card"><div class="sol-icon">'+esc(c.icon)+'</div><div class="sol-title">'+esc(c.title)+'</div><div class="sol-desc">'+esc(c.desc)+'</div><div class="sol-tags">'+tags+'</div></div>';
+  }).join('');
+  // 聯絡資訊(各自勾選是否顯示)
+  var rows='';
+  function row(icon,txt){rows+='<div class="contact-row"><div class="c-icon">'+icon+'</div><div class="c-text">'+esc(txt)+'</div></div>';}
+  if(T('show_email')==='1'&&T('contact_email')) row('📧',T('contact_email'));
+  if(T('show_phone')==='1'&&T('contact_phone')) row('📞',T('contact_phone'));
+  if(T('show_line')==='1'&&T('contact_line')) row('💬','LINE: '+T('contact_line'));
+  if(T('show_web')==='1'&&T('contact_web')) row('🌐',T('contact_web'));
+  if(T('show_addr')==='1'&&T('contact_addr')) row('📍',T('contact_addr'));
+  if(T('show_addr_en')==='1'&&T('contact_addr_en')) row('📍',T('contact_addr_en'));
+  document.getElementById('contact-rows').innerHTML=rows;
+  var mb=document.getElementById('map-box');
+  var mq=T('map_query')||T('contact_addr');
+  if(T('show_map')==='1'&&mq){
+    mb.style.display='';
+    mb.innerHTML='<iframe loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Google Map" src="https://maps.google.com/maps?q='+encodeURIComponent(mq)+'&z=16&output=embed"></iframe>';
+  } else {mb.style.display='none';mb.innerHTML='';}
+  renderCatTabs();
+}
+
 async function loadSiteSettings(){
   var {data}=await sb.from('site_settings').select('*');
   if(!data) return;
   var s={};
   data.forEach(function(r){s[r.key]=r.value;});
-  if(s.about_title){var e=document.getElementById('about-title');if(e)e.textContent=s.about_title;}
-  if(s.about_desc){var e=document.getElementById('about-desc');if(e)e.textContent=s.about_desc;}
-  if(s.about_img){
-    var b=document.getElementById('about-img');
-    if(b){
-      var sc = parseFloat(s.about_img_scale)||1;
-      var tx = parseFloat(s.about_img_x)||0;
-      var ty = parseFloat(s.about_img_y)||0;
-      var url=s.about_img+'?t='+Date.now();
-      b.innerHTML='<img src="'+url+'" alt="關於我們" style="position:absolute;top:50%;left:50%;transform:translate(calc(-50% + '+tx+'px), calc(-50% + '+ty+'px)) scale('+sc+');transform-origin:center;width:100%;"/>';
-    }
-  }
-  if(s.contact_email){var e=document.getElementById('c-email');if(e)e.textContent=s.contact_email;}
-  if(s.contact_addr){var e=document.getElementById('c-addr');if(e)e.textContent=s.contact_addr;}
-  if(s.hero_img){var h=document.getElementById('hero-img');if(h)h.src=s.hero_img+'?t='+Date.now();}
+  CFG=zhieMerge(s);
+  try{SIZE_IMGS_OVERRIDE=JSON.parse(s.size_imgs||'{}')||{};}catch(e){SIZE_IMGS_OVERRIDE={};}
+  applyConfig();
+  if(allProducts.length) (currentView==='products'&&currentSize?showProducts(currentSize):renderSizes());
 }
 
-window.addEventListener('DOMContentLoaded',function(){loadProducts();loadSiteSettings();setupNav();});
+window.addEventListener('DOMContentLoaded',function(){applyConfig();loadProducts();loadSiteSettings();setupNav();});
 </script>
 </body>
 </html>

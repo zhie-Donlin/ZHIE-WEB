@@ -3,912 +3,405 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ZHIE 後台管理系統</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>致一科技 — 網站後台</title>
+<link rel="icon" type="image/png" href="logo.png"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="site-schema.js"></script>
 <style>
+/*
+ * 致一科技 網站後台(真登入版)
+ * - 登入:Supabase Auth(Email+密碼),不再有寫死帳密。
+ * - 管理員名單:資料庫表 site_admins(見 sql/01_*.sql)。新增管理員 = 先在 Supabase Authentication 建使用者,再把 email 加進 site_admins。
+ * - 可改的網站文字/圖片清單與欄位定義:site-schema.js。資料存在 site_settings(key,value)。
+ * - 產品:products 表。詢價:inquiries 表。圖片:Storage bucket「products」下的 site/ 資料夾。
+ */
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Noto Sans TC',system-ui,sans-serif;background:#f4f6f9;color:#1c2333;font-size:14px;line-height:1.6;}
-:root{
-  --blue:#1a56db;--blue-hover:#1348c0;--blue-light:#e8effd;
-  --navy:#0f2057;--white:#fff;
-  --gray-50:#f4f6f9;--gray-100:#edf0f5;--gray-200:#dde2ed;--gray-300:#c4cce0;
-  --gray-500:#6b7a99;--gray-700:#3d4d6b;--gray-900:#1c2333;
-  --green:#1a7a4a;--green-bg:#d4f0e2;
-  --red:#b03030;--red-bg:#fde0e0;
-  --amber:#8a5a00;--amber-bg:#fdedc8;
-  --radius:8px;--radius-lg:12px;
-  --shadow:0 2px 8px rgba(15,32,87,0.08);
-  --shadow-lg:0 8px 32px rgba(15,32,87,0.12);
+:root{--blue:#1a56db;--navy:#0f2057;--bg:#f4f6f9;--line:#dde2ed;--mute:#6b7a99;--red:#c0392b;--green:#1e8e3e;}
+body{font-family:'Noto Sans TC','Segoe UI',system-ui,sans-serif;background:var(--bg);color:#1c2333;font-size:15px;line-height:1.6;}
+button{font-family:inherit;cursor:pointer;}
+.btn{display:inline-block;padding:9px 18px;border-radius:8px;border:1.5px solid var(--line);background:#fff;font-size:14px;color:var(--navy);}
+.btn:hover{border-color:var(--blue);}
+.btn-p{background:var(--blue);border-color:var(--blue);color:#fff;}
+.btn-p:hover{background:#1348c0;}
+.btn-d{color:var(--red);border-color:#f0c4be;}
+.btn-s{padding:5px 11px;font-size:13px;}
+input[type=text],input[type=email],input[type=password],input[type=number],textarea,select{width:100%;padding:9px 11px;border:1.5px solid var(--line);border-radius:8px;font:inherit;font-size:14px;background:#fff;}
+textarea{min-height:80px;resize:vertical;}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);}
+label.l{display:block;font-size:12px;color:var(--mute);margin:12px 0 4px;}
+#login{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50;}
+.box{background:#fff;border:1px solid var(--line);border-radius:14px;padding:28px;width:100%;max-width:380px;box-shadow:0 8px 30px rgba(15,32,87,.08);}
+#app{display:none;}
+.top{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:56px;gap:8px;}
+.top b{color:var(--navy);font-size:16px;}
+.top .r{display:flex;gap:8px;align-items:center;}
+.menu-btn{display:none;}
+.layout{display:flex;}
+.side{width:230px;flex-shrink:0;background:#fff;border-right:1px solid var(--line);min-height:calc(100vh - 56px);padding:10px 0;}
+.side a{display:block;padding:10px 20px;font-size:14px;color:#3d4d6b;cursor:pointer;border-left:3px solid transparent;}
+.side a:hover{background:var(--bg);}
+.side a.on{background:#e8effd;color:var(--blue);border-left-color:var(--blue);font-weight:600;}
+.side .g{font-size:11px;color:var(--mute);padding:12px 20px 4px;letter-spacing:.08em;}
+.main{flex:1;min-width:0;padding:22px;max-width:960px;}
+h1{font-size:20px;color:var(--navy);margin-bottom:4px;}
+.sub{color:var(--mute);font-size:13px;margin-bottom:16px;}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:14px;}
+.item{border:1px dashed var(--line);border-radius:10px;padding:12px;margin:10px 0;background:#fafbfd;}
+.item .h{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px;}
+.tg{display:flex;align-items:center;gap:8px;margin:14px 0 2px;font-size:14px;}
+.tg input{width:18px;height:18px;}
+.imgbox{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.imgbox img{max-height:90px;max-width:160px;border:1px solid var(--line);border-radius:8px;background:#fff;object-fit:contain;}
+.savebar{position:sticky;bottom:0;background:linear-gradient(transparent,var(--bg) 30%);padding:14px 0 6px;display:flex;gap:10px;align-items:center;}
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:10px 22px;border-radius:10px;font-size:14px;z-index:99;display:none;max-width:90vw;}
+#toast.err{background:var(--red);}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top;}
+th{color:var(--mute);font-size:12px;font-weight:600;}
+.badge{font-size:11px;padding:2px 8px;border-radius:10px;background:#e8effd;color:var(--blue);}
+.badge.off{background:#eee;color:#888;}
+.modal{position:fixed;inset:0;background:rgba(15,32,87,.45);display:none;align-items:flex-start;justify-content:center;padding:16px;z-index:60;overflow-y:auto;}
+.modal.on{display:flex;}
+.modal .in{background:#fff;border-radius:14px;padding:22px;width:100%;max-width:680px;margin:20px 0;}
+.warn{background:#fff6e0;border:1px solid #f0d58a;color:#7a5b00;border-radius:10px;padding:10px 14px;font-size:13px;margin-bottom:14px;}
+@media(max-width:800px){
+  .menu-btn{display:inline-block;}
+  .side{position:fixed;left:0;top:56px;bottom:0;z-index:30;transform:translateX(-100%);transition:transform .2s;overflow-y:auto;}
+  .side.open{transform:none;box-shadow:4px 0 20px rgba(0,0,0,.15);}
+  .main{padding:14px;}
+  .row2{grid-template-columns:1fr;}
+  .tbl-wrap{overflow-x:auto;}
 }
-
-/* LOGIN */
-#login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--navy);}
-.login-box{background:var(--white);border-radius:16px;padding:40px 36px;width:380px;box-shadow:var(--shadow-lg);}
-.login-logo{text-align:center;margin-bottom:24px;}
-.login-logo img{height:56px;}
-.login-title{font-size:18px;font-weight:700;color:var(--navy);text-align:center;margin-bottom:4px;}
-.login-sub{font-size:13px;color:var(--gray-500);text-align:center;margin-bottom:24px;}
-
-/* APP LAYOUT */
-#app{display:none;min-height:100vh;}
-.sidebar{width:220px;background:var(--navy);position:fixed;top:0;left:0;height:100vh;z-index:50;display:flex;flex-direction:column;}
-.sidebar-logo{padding:20px 16px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:10px;}
-.sidebar-logo img{height:32px;}
-.sidebar-logo-text{font-size:13px;font-weight:700;color:#fff;line-height:1.3;}
-.sidebar-logo-en{font-size:10px;color:rgba(255,255,255,0.5);font-weight:400;}
-.sidebar-nav{flex:1;padding:12px 8px;overflow-y:auto;}
-.nav-section{font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:0.08em;padding:12px 8px 6px;margin-top:4px;}
-.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius);color:rgba(255,255,255,0.65);cursor:pointer;font-size:13px;font-weight:500;transition:all 0.15s;margin-bottom:2px;}
-.nav-item:hover{background:rgba(255,255,255,0.08);color:#fff;}
-.nav-item.active{background:var(--blue);color:#fff;}
-.nav-item i{width:16px;font-size:15px;}
-.sidebar-footer{padding:12px 8px;border-top:1px solid rgba(255,255,255,0.08);}
-.main{margin-left:220px;min-height:100vh;}
-.topbar{background:var(--white);border-bottom:1px solid var(--gray-200);padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;}
-.page-title{font-size:16px;font-weight:700;color:var(--navy);}
-.content{padding:24px 28px;}
-
-/* CARDS */
-.card{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:20px;margin-bottom:16px;}
-.card-title{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
-
-/* INPUTS */
-.inp{width:100%;padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:var(--radius);font-size:13px;color:var(--gray-900);background:#fff;outline:none;transition:border-color 0.15s;font-family:inherit;}
-.inp:focus{border-color:var(--blue);}
-.inp::placeholder{color:var(--gray-300);}
-select.inp option{background:#fff;}
-textarea.inp{resize:none;line-height:1.6;}
-.lbl{font-size:11px;font-weight:600;color:var(--gray-500);margin-bottom:4px;display:block;letter-spacing:0.04em;}
-.form-row{margin-bottom:12px;}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
-
-/* BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius);font-size:13px;font-weight:500;border:none;cursor:pointer;transition:all 0.15s;}
-.btn-primary{background:var(--blue);color:#fff;}
-.btn-primary:hover{background:var(--blue-hover);}
-.btn-ghost{background:transparent;color:var(--gray-700);border:1.5px solid var(--gray-200);}
-.btn-ghost:hover{background:var(--gray-100);}
-.btn-danger{background:var(--red-bg);color:var(--red);border:1px solid #f0b8b8;}
-.btn-success{background:var(--green-bg);color:var(--green);}
-.btn-sm{padding:5px 10px;font-size:12px;}
-.btn:disabled{opacity:0.5;cursor:not-allowed;}
-
-/* BADGES */
-.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500;}
-.b-blue{background:var(--blue-light);color:var(--blue);}
-.b-green{background:var(--green-bg);color:var(--green);}
-.b-amber{background:var(--amber-bg);color:var(--amber);}
-.b-red{background:var(--red-bg);color:var(--red);}
-.b-gray{background:var(--gray-100);color:var(--gray-500);}
-
-/* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(15,32,87,0.4);backdrop-filter:blur(3px);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;}
-.modal-box{background:var(--white);border-radius:var(--radius-lg);width:100%;max-width:680px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);}
-.modal-header{padding:18px 22px;border-bottom:1px solid var(--gray-200);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--white);z-index:5;}
-.modal-title{font-size:15px;font-weight:700;color:var(--navy);}
-.modal-body{padding:20px 22px;}
-.modal-footer{padding:14px 22px;border-top:1px solid var(--gray-200);display:flex;justify-content:flex-end;gap:8px;}
-
-/* TABLE */
-.tbl{width:100%;border-collapse:collapse;font-size:13px;}
-.tbl th{background:var(--gray-50);padding:9px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--gray-500);letter-spacing:0.04em;border-bottom:1px solid var(--gray-200);white-space:nowrap;}
-.tbl td{padding:10px 14px;border-bottom:1px solid var(--gray-100);color:var(--gray-900);vertical-align:middle;}
-.tbl tr:hover td{background:var(--gray-50);}
-.tbl tr:last-child td{border-bottom:none;}
-
-/* IMAGE UPLOAD */
-.img-upload-area{border:2px dashed var(--gray-300);border-radius:var(--radius-lg);padding:24px;text-align:center;cursor:pointer;transition:all 0.15s;background:var(--gray-50);}
-.img-upload-area:hover{border-color:var(--blue);background:var(--blue-light);}
-.img-upload-area.dragover{border-color:var(--blue);background:var(--blue-light);}
-.img-preview{width:100%;max-height:220px;object-fit:contain;border-radius:var(--radius);border:1px solid var(--gray-200);margin-top:10px;}
-
-/* CROPPER */
-.cropper-wrap{background:#000;border-radius:var(--radius);overflow:hidden;max-height:320px;}
-.cropper-wrap img{max-width:100%;}
-
-/* STATS */
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
-.stat-card{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:16px;}
-.stat-num{font-size:28px;font-weight:700;color:var(--navy);line-height:1;}
-.stat-label{font-size:12px;color:var(--gray-500);margin-top:4px;}
-.stat-card.blue{border-left:4px solid var(--blue);}
-.stat-card.green{border-left:4px solid var(--green);}
-.stat-card.amber{border-left:4px solid #f59e0b;}
-
-/* TOAST */
-.toast{position:fixed;bottom:24px;right:24px;background:var(--navy);color:#fff;padding:12px 20px;border-radius:var(--radius-lg);font-size:13px;font-weight:500;z-index:999;box-shadow:var(--shadow-lg);transform:translateY(100px);opacity:0;transition:all 0.25s;}
-.toast.show{transform:translateY(0);opacity:1;}
-.toast.success{background:#1a7a4a;}
-.toast.error{background:var(--red);}
-
-/* MISC */
-.spinner{width:16px;height:16px;border:2px solid var(--gray-200);border-top-color:var(--blue);border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.empty{text-align:center;padding:48px 0;color:var(--gray-500);}
-.divider{height:1px;background:var(--gray-200);margin:16px 0;}
-.size-cat-header{background:var(--gray-50);padding:8px 14px;font-size:12px;font-weight:700;color:var(--navy);border-bottom:1px solid var(--gray-200);border-top:1px solid var(--gray-200);}
-.size-cat-header:first-child{border-top:none;}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div id="login-wrap">
-  <div class="login-box">
-    <div class="login-logo"><img src="logo.png" alt="ZHIE"/></div>
-    <div class="login-title">後台管理系統</div>
-    <div class="login-sub">ZHIE CO., LTD. Admin Panel</div>
-    <div class="form-row"><label class="lbl">管理員帳號</label><input class="inp" id="l-user" value="zhie" autocomplete="username"/></div>
-    <div class="form-row"><label class="lbl">密碼</label><input class="inp" type="password" id="l-pass" onkeydown="if(event.key==='Enter')doLogin()"/></div>
-    <div id="l-err" style="display:none;color:var(--red);font-size:12px;margin-bottom:10px;"></div>
-    <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="doLogin()" id="l-btn"><i class="fa-solid fa-right-to-bracket"></i> 登入</button>
+<!-- 登入 -->
+<div id="login">
+  <div class="box">
+    <div style="text-align:center;margin-bottom:18px;">
+      <img src="logo.png" alt="ZHIE" style="height:56px;" onerror="this.style.display='none'"/>
+      <div style="font-size:18px;font-weight:700;color:var(--navy);margin-top:8px;">致一科技 網站後台</div>
+    </div>
+    <label class="l">管理員 Email</label>
+    <input type="email" id="lg-email" autocomplete="username" placeholder="zhie@zhietech.com"/>
+    <label class="l">密碼</label>
+    <input type="password" id="lg-pass" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <div id="lg-err" style="color:var(--red);font-size:13px;margin-top:10px;display:none;"></div>
+    <button class="btn btn-p" style="width:100%;margin-top:16px;" onclick="doLogin()">登入</button>
+    <p style="font-size:12px;color:var(--mute);text-align:center;margin-top:14px;">忘記密碼請聯絡網站管理員協助重設</p>
   </div>
 </div>
 
-<!-- APP -->
 <div id="app">
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <div class="sidebar-logo">
-      <img src="logo.png" alt="ZHIE"/>
-      <div>
-        <div class="sidebar-logo-text">致一科技</div>
-        <div class="sidebar-logo-en">ZHIE CO., LTD.</div>
-      </div>
+  <div class="top">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button class="btn btn-s menu-btn" onclick="document.getElementById('side').classList.toggle('open')">☰ 選單</button>
+      <b>致一科技 網站後台</b>
     </div>
-    <nav class="sidebar-nav">
-      <div class="nav-section">主選單</div>
-      <div class="nav-item active" onclick="showPage('dashboard')"><i class="fa-solid fa-chart-pie"></i> 儀表板</div>
-      <div class="nav-section">內容管理</div>
-      <div class="nav-item" onclick="showPage('homepage')"><i class="fa-solid fa-house"></i> 首頁設定</div>
-      <div class="nav-item" onclick="showPage('products')"><i class="fa-solid fa-microchip"></i> 產品管理</div>
-      <div class="nav-item" onclick="showPage('about')"><i class="fa-solid fa-building"></i> 關於我們</div>
-      <div class="nav-item" onclick="showPage('contact')"><i class="fa-solid fa-address-card"></i> 聯絡資訊</div>
-      <div class="nav-section">系統</div>
-      <div class="nav-item" onclick="showPage('settings')"><i class="fa-solid fa-gear"></i> 系統設定</div>
-    </nav>
-    <div class="sidebar-footer">
-      <div class="nav-item" onclick="doLogout()"><i class="fa-solid fa-right-from-bracket"></i> 登出</div>
+    <div class="r">
+      <span id="who" style="font-size:12px;color:var(--mute);"></span>
+      <a class="btn btn-s" href="index.html" target="_blank">看網站</a>
+      <button class="btn btn-s" onclick="doLogout()">登出</button>
     </div>
   </div>
-
-  <!-- MAIN -->
-  <div class="main">
-    <div class="topbar">
-      <div class="page-title" id="page-title">儀表板</div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <a href="index.html" target="_blank" class="btn btn-ghost btn-sm"><i class="fa-solid fa-eye"></i> 預覽網站</a>
-        <div style="font-size:12px;color:var(--gray-500);" id="topbar-user"></div>
-      </div>
-    </div>
-    <div class="content">
-
-      <!-- DASHBOARD -->
-      <div id="page-dashboard">
-        <div class="stats-grid" id="dash-stats"></div>
-        <div class="card">
-          <div class="card-title"><i class="fa-solid fa-clock-rotate-left" style="color:var(--blue);"></i> 快速操作</div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="btn btn-primary" onclick="showPage('products');openProductModal(null)"><i class="fa-solid fa-plus"></i> 新增產品</button>
-            <button class="btn btn-ghost" onclick="showPage('products')"><i class="fa-solid fa-microchip"></i> 管理產品</button>
-            <button class="btn btn-ghost" onclick="showPage('about')"><i class="fa-solid fa-building"></i> 編輯關於我們</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- HOMEPAGE -->
-      <div id="page-homepage" style="display:none;">
-        <div class="card">
-          <div class="card-title"><i class="fa-solid fa-image" style="color:var(--blue);"></i> 首頁 Hero 主圖片</div>
-          <div id="hero-img-preview" style="background:var(--gray-100);border:1px solid var(--gray-200);border-radius:var(--radius);aspect-ratio:16/7;display:flex;align-items:center;justify-content:center;color:var(--gray-300);font-size:13px;margin-bottom:12px;overflow:hidden;">尚未上傳</div>
-          <div class="img-upload-area" onclick="document.getElementById('hero-img-input').click()">
-            <i class="fa-solid fa-cloud-arrow-up" style="font-size:28px;color:var(--gray-300);display:block;margin-bottom:8px;"></i>
-            <div style="font-size:14px;color:var(--gray-500);">點擊或拖曳上傳首頁主圖片</div>
-            <div style="font-size:12px;color:var(--gray-300);margin-top:4px;">建議橫式圖片，比例 16:9 效果最佳</div>
-          </div>
-          <input type="file" id="hero-img-input" accept="image/*" style="display:none;" onchange="startCrop(this,'hero')"/>
-          <div style="margin-top:14px;">
-            <button class="btn btn-primary" onclick="saveHeroImg()"><i class="fa-solid fa-floppy-disk"></i> 儲存首頁圖片</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- PRODUCTS -->
-      <div id="page-products" style="display:none;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button class="btn btn-primary" onclick="openProductModal(null)"><i class="fa-solid fa-plus"></i> 新增產品</button>
-            <button class="btn btn-ghost" onclick="openExcelImport()"><i class="fa-solid fa-file-excel"></i> 匯入 Excel</button>
-          </div>
-          <div style="display:flex;gap:8px;">
-            <input class="inp" style="width:200px;" placeholder="搜尋型號..." id="prod-search" oninput="renderProductTable()"/>
-            <select class="inp" style="width:130px;" id="prod-cat-filter" onchange="renderProductTable()">
-              <option value="">全部分類</option>
-              <option>TFT彩色</option>
-              <option>MONO LCM</option>
-              <option>觸控模組</option>
-              <option>客製化</option>
-            </select>
-            <select class="inp" style="width:110px;" id="prod-size-filter" onchange="renderProductTable()">
-              <option value="">全部尺寸</option>
-            </select>
-          </div>
-        </div>
-        <div class="card" style="padding:0;overflow:hidden;">
-          <div id="prod-table-wrap"></div>
-        </div>
-      </div>
-
-      <!-- ABOUT -->
-      <div id="page-about" style="display:none;">
-        <div class="card">
-          <div class="card-title"><i class="fa-solid fa-image" style="color:var(--blue);"></i> 關於我們 — 主圖片</div>
-          <div id="about-img-preview"
-            style="background:var(--gray-100);border:1px solid var(--gray-200);border-radius:var(--radius);position:relative;overflow:hidden;height:260px;margin-bottom:8px;cursor:grab;"
-            onwheel="adminZoom(event,'about')"
-            onmousedown="adminDragStart(event,'about')"
-            onmousemove="adminDragMove(event,'about')"
-            onmouseup="adminDragEnd('about')"
-            onmouseleave="adminDragEnd('about')">
-            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--gray-300);font-size:13px;" id="about-preview-ph">尚未上傳</div>
-          </div>
-          <div style="font-size:11px;color:var(--gray-500);margin-bottom:10px;"><i class="fa-solid fa-circle-info" style="color:var(--blue);margin-right:4px;"></i>滾輪縮放、拖移調整顯示位置，調整好再按儲存</div>
-          <div class="img-upload-area" onclick="document.getElementById('about-img-input').click()">
-            <i class="fa-solid fa-cloud-arrow-up" style="font-size:28px;color:var(--gray-300);display:block;margin-bottom:8px;"></i>
-            <div style="font-size:14px;color:var(--gray-500);">點擊或拖曳上傳關於我們圖片</div>
-            <div style="font-size:12px;color:var(--gray-300);margin-top:4px;">建議尺寸：800×600px</div>
-          </div>
-          <input type="file" id="about-img-input" accept="image/*" style="display:none;" onchange="startCrop(this,'about')"/>
-        </div>
-        <div class="card">
-          <div class="card-title"><i class="fa-solid fa-pen" style="color:var(--blue);"></i> 公司介紹文字</div>
-          <div class="form-row"><label class="lbl">公司標題</label><input class="inp" id="about-title" placeholder="由研發驅動的顯示專家"/></div>
-          <div class="form-row"><label class="lbl">公司簡介</label><textarea class="inp" id="about-desc" style="height:100px;" placeholder="公司介紹文字..."></textarea></div>
-          <button class="btn btn-primary" onclick="saveAbout()"><i class="fa-solid fa-floppy-disk"></i> 儲存</button>
-        </div>
-      </div>
-
-      <!-- CONTACT -->
-      <div id="page-contact" style="display:none;">
-        <div class="card">
-          <div class="card-title"><i class="fa-solid fa-address-card" style="color:var(--blue);"></i> 聯絡資訊</div>
-          <div class="grid2">
-            <div class="form-row"><label class="lbl">Email</label><input class="inp" id="c-email" placeholder="info@zhietech.com"/></div>
-            <div class="form-row"><label class="lbl">電話</label><input class="inp" id="c-phone" placeholder="+886-..."/></div>
-            <div class="form-row"><label class="lbl">地址</label><input class="inp" id="c-addr" placeholder="台灣..."/></div>
-            <div class="form-row"><label class="lbl">LINE / WeChat</label><input class="inp" id="c-line" placeholder="ID..."/></div>
-          </div>
-          <button class="btn btn-primary" onclick="saveContact()"><i class="fa-solid fa-floppy-disk"></i> 儲存</button>
-        </div>
-      </div>
-
-      <!-- SETTINGS -->
-      <div id="page-settings" style="display:none;">
-        <div class="card">
-          <div class="card-title"><i class="fa-solid fa-key" style="color:var(--blue);"></i> 帳號管理</div>
-          <div class="grid2">
-            <div class="form-row"><label class="lbl">新帳號</label><input class="inp" id="s-user" placeholder="新帳號名稱"/></div>
-            <div class="form-row"><label class="lbl">新密碼</label><input class="inp" type="password" id="s-pass" placeholder="新密碼"/></div>
-          </div>
-          <button class="btn btn-primary" onclick="saveAccount()"><i class="fa-solid fa-floppy-disk"></i> 儲存帳號設定</button>
-        </div>
-        <div class="card">
-          <div class="card-title"><i class="fa-solid fa-database" style="color:var(--blue);"></i> Supabase 連線設定</div>
-          <div class="form-row"><label class="lbl">Project URL</label><input class="inp" id="s-sb-url" placeholder="https://xxx.supabase.co"/></div>
-          <div class="form-row"><label class="lbl">Anon Key</label><input class="inp" id="s-sb-key" placeholder="eyJ..."/></div>
-          <button class="btn btn-primary" onclick="saveSB()"><i class="fa-solid fa-floppy-disk"></i> 儲存並重新連線</button>
-        </div>
-      </div>
-
-    </div>
+  <div class="layout">
+    <div class="side" id="side"></div>
+    <div class="main" id="pane"></div>
   </div>
 </div>
 
-<!-- PRODUCT MODAL -->
-<div id="modal-product" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('modal-product')">
-  <div class="modal-box">
-    <div class="modal-header">
-      <div class="modal-title" id="prod-modal-title">新增產品</div>
-      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-product')"><i class="fa-solid fa-xmark"></i></button>
-    </div>
-    <div class="modal-body">
-      <!-- 圖片上傳 -->
-      <div class="form-row">
-        <label class="lbl">產品圖片</label>
-        <div id="prod-img-preview" style="background:var(--gray-100);border:1px solid var(--gray-200);border-radius:var(--radius);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;color:var(--gray-300);font-size:12px;margin-bottom:8px;overflow:hidden;max-height:180px;">尚未上傳</div>
-        <div class="img-upload-area" onclick="document.getElementById('prod-img-input').click()" style="padding:14px;">
-          <i class="fa-solid fa-image" style="color:var(--gray-300);display:block;margin-bottom:4px;font-size:20px;"></i>
-          <div style="font-size:12px;color:var(--gray-500);">點擊上傳產品圖片</div>
-        </div>
-        <input type="file" id="prod-img-input" accept="image/*" style="display:none;" onchange="startCrop(this,'prod')"/>
-      </div>
-      <div class="divider"></div>
-      <!-- 基本資料 -->
-      <div class="grid2">
-        <div class="form-row"><label class="lbl">型號 Model Name *</label><input class="inp" id="p-model" placeholder="EFT032AA240320C"/></div>
-        <div class="form-row"><label class="lbl">Panel Size（吋）</label><input class="inp" id="p-panel" placeholder="3.2"/></div>
-        <div class="form-row"><label class="lbl">大分類</label>
-          <select class="inp" id="p-cat">
-            <option>TFT彩色</option><option>MONO LCM</option><option>觸控模組</option><option>客製化</option>
-          </select>
-        </div>
-        <div class="form-row"><label class="lbl">尺寸分類（吋）</label><input class="inp" id="p-size" placeholder="3.5"/></div>
-        <div class="form-row"><label class="lbl">觸控類型 TP</label>
-          <select class="inp" id="p-tp"><option value="NA">NA（無觸控）</option><option value="CTP">CTP（電容）</option><option value="RTP">RTP（電阻）</option></select>
-        </div>
-        <div class="form-row"><label class="lbl">解析度</label><input class="inp" id="p-res" placeholder="240x320"/></div>
-        <div class="form-row"><label class="lbl">Gray Scale</label><input class="inp" id="p-gray" placeholder="12"/></div>
-        <div class="form-row"><label class="lbl">亮度 Brightness（nits）</label><input class="inp" id="p-bright" placeholder="270"/></div>
-        <div class="form-row"><label class="lbl">Outline (mm)</label><input class="inp" id="p-outline" placeholder="55.04 x 77.7 x 3.73"/></div>
-        <div class="form-row"><label class="lbl">Active Area (mm)</label><input class="inp" id="p-active" placeholder="48.6 x 64.8"/></div>
-        <div class="form-row"><label class="lbl">背光條件</label><input class="inp" id="p-backlight" placeholder="3.2V/120mA"/></div>
-        <div class="form-row"><label class="lbl">Driver IC</label><input class="inp" id="p-driver" placeholder="ILI9341V"/></div>
-        <div class="form-row"><label class="lbl">Interface</label><input class="inp" id="p-interface" placeholder="16/4 SPI MCU"/></div>
-        <div class="form-row"><label class="lbl">Pin Out</label><input class="inp" id="p-pinout" placeholder="40pin FPC"/></div>
-        <div class="form-row"><label class="lbl">操作溫度 OP TEMP</label><input class="inp" id="p-temp" placeholder="-20~70"/></div>
-        <div class="form-row"><label class="lbl">狀態</label>
-          <select class="inp" id="p-status"><option value="active">上架中</option><option value="inactive">下架</option></select>
-        </div>
-      </div>
-      <div class="form-row"><label class="lbl">備註</label><textarea class="inp" id="p-note" style="height:60px;"></textarea></div>
-      <input type="hidden" id="p-id"/>
-      <input type="hidden" id="p-img-url"/>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-product')">取消</button>
-      <button class="btn btn-primary" onclick="saveProduct()"><i class="fa-solid fa-floppy-disk"></i> 儲存</button>
-    </div>
-  </div>
-</div>
-
-<!-- EXCEL IMPORT MODAL -->
-<div id="modal-excel" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('modal-excel')">
-  <div class="modal-box">
-    <div class="modal-header">
-      <div class="modal-title"><i class="fa-solid fa-file-excel" style="color:var(--green);margin-right:8px;"></i>匯入 Excel</div>
-      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-excel')"><i class="fa-solid fa-xmark"></i></button>
-    </div>
-    <div class="modal-body">
-      <div style="background:var(--blue-light);border-radius:var(--radius);padding:12px 14px;font-size:13px;color:var(--blue);margin-bottom:14px;">
-        <b>Excel 格式說明：</b>每個工作表名稱為尺寸（如「3.5吋」），欄位順序為：Model Name、Panel Size、TP、Gray Scale、Resolution、Outline、Active Area、亮度、背光條件、Driver IC、Interface、Pin Out、OP TEMP、備註
-      </div>
-      <div class="img-upload-area" onclick="document.getElementById('excel-input').click()" id="excel-drop" style="margin-bottom:14px;">
-        <i class="fa-solid fa-file-excel" style="font-size:32px;color:var(--gray-300);display:block;margin-bottom:8px;"></i>
-        <div style="font-size:14px;color:var(--gray-500);">點擊選擇 Excel 檔案（.xls / .xlsx）</div>
-      </div>
-      <input type="file" id="excel-input" accept=".xls,.xlsx" style="display:none;" onchange="readExcel(this)"/>
-      <div id="excel-preview"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-excel')">取消</button>
-      <button class="btn btn-primary" id="excel-import-btn" style="display:none;" onclick="importExcel()"><i class="fa-solid fa-file-import"></i> 確認匯入</button>
-    </div>
-  </div>
-</div>
-
-<!-- TOAST -->
-<div id="toast" class="toast"></div>
+<!-- 產品編輯視窗 -->
+<div class="modal" id="pmodal"><div class="in" id="pmodal-in"></div></div>
+<div id="toast"></div>
 
 <script>
-// ── CONFIG ──
-const SB_URL = localStorage.getItem('zhie_sb_url') || 'https://zyzmadwlvlgoamppaosg.supabase.co';
-const SB_KEY = localStorage.getItem('zhie_sb_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp5em1hZHdsdmxnb2FtcHBhb3NnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NjI4NjYsImV4cCI6MjA5NjEzODg2Nn0.fyzo1dhruC3PB3ioSL64c8GLLrK7hcR5updxgrmiBnI';
-const SB_STORAGE = SB_URL + '/storage/v1/object/public/products/';
-var sb = supabase.createClient(SB_URL, SB_KEY);
+var SB_URL='https://zyzmadwlvlgoamppaosg.supabase.co';
+var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp5em1hZHdsdmxnb2FtcHBhb3NnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NjI4NjYsImV4cCI6MjA5NjEzODg2Nn0.fyzo1dhruC3PB3ioSL64c8GLLrK7hcR5updxgrmiBnI';
+var sb=supabase.createClient(SB_URL,SB_KEY);   // 公開的匿名金鑰(本來就會出現在前台);真正的權限由登入+資料庫規則決定
+var SB_STORAGE=SB_URL+'/storage/v1/object/public/products/';
 
-var ADMIN_USER = localStorage.getItem('zhie_admin_user') || 'zhie';
-var ADMIN_PASS = localStorage.getItem('zhie_admin_pass') || 'zhie68467475';
+var RAW={}, CUR={}, SIZEIMGS={}, CURPAGE='';
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function $(id){return document.getElementById(id);}
+function toast(msg,err){var t=$('toast');t.textContent=msg;t.className=err?'err':'';t.style.display='block';clearTimeout(toast._t);toast._t=setTimeout(function(){t.style.display='none';},err?6000:2500);}
 
-var allProducts = [];
-var excelData = [];
-var croppers = {};
-var pendingUpload = {};
-
-// ── AUTH ──
-function doLogin() {
-  var u = document.getElementById('l-user').value.trim();
-  var p = document.getElementById('l-pass').value;
-  var err = document.getElementById('l-err');
-  if (u === ADMIN_USER && p === ADMIN_PASS) {
-    document.getElementById('login-wrap').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    document.getElementById('topbar-user').textContent = u;
-    loadDashboard();
-    loadProducts();
-    loadSettings();
-  } else {
-    err.textContent = '帳號或密碼錯誤';
-    err.style.display = 'block';
-  }
+/* ============ 登入 ============ */
+async function doLogin(){
+  var e=$('lg-email').value.trim(), p=$('lg-pass').value;
+  $('lg-err').style.display='none';
+  if(!e||!p){showLgErr('請輸入 Email 與密碼');return;}
+  var r=await sb.auth.signInWithPassword({email:e,password:p});
+  if(r.error){showLgErr('Email 或密碼錯誤');return;}
+  await enter(r.data.session);
 }
-function doLogout() {
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('login-wrap').style.display = 'flex';
-  document.getElementById('l-pass').value = '';
+function showLgErr(m){var x=$('lg-err');x.textContent=m;x.style.display='block';}
+async function doLogout(){await sb.auth.signOut();location.reload();}
+var ADMIN_TABLE_MISSING=false;
+async function enter(session){
+  if(!session){return;}
+  var r=await sb.from('site_admins').select('email');
+  if(r.error){ADMIN_TABLE_MISSING=true;}   // 管理員名單表還沒建立(SQL 01 尚未執行):暫時放行
+  else if(!r.data||!r.data.length){await sb.auth.signOut();showLgErr('此帳號不是網站管理員');return;}
+  $('who').textContent=session.user.email;
+  $('login').style.display='none';$('app').style.display='block';
+  await loadSettings();
+  buildSide();
+  go('sec:common');
 }
+(async function(){var r=await sb.auth.getSession();if(r.data&&r.data.session)enter(r.data.session);})();
 
-// ── PAGES ──
-function showPage(name) {
-  ['dashboard','homepage','products','about','contact','settings'].forEach(function(p) {
-    document.getElementById('page-'+p).style.display = p===name ? '' : 'none';
-  });
-  document.querySelectorAll('.nav-item').forEach(function(el) {
-    el.classList.remove('active');
-    if (el.getAttribute('onclick') && el.getAttribute('onclick').includes("'"+name+"'")) el.classList.add('active');
-  });
-  var titles = {dashboard:'儀表板',homepage:'首頁設定',products:'產品管理',about:'關於我們',contact:'聯絡資訊',settings:'系統設定'};
-  document.getElementById('page-title').textContent = titles[name] || name;
-  if (name === 'products') renderProductTable();
-  if (name === 'homepage') loadHomepage();
-  if (name === 'about') loadAbout();
-  if (name === 'contact') loadContact();
-  if (name === 'settings') loadSettings();
+/* ============ 設定讀寫 ============ */
+async function loadSettings(){
+  var r=await sb.from('site_settings').select('*');
+  RAW={};(r.data||[]).forEach(function(x){RAW[x.key]=x.value;});
+  CUR=zhieMerge(RAW);
+  try{SIZEIMGS=JSON.parse(RAW.size_imgs||'{}')||{};}catch(e){SIZEIMGS={};}
+}
+async function saveRows(rows){
+  rows.forEach(function(r){r.updated_at=new Date().toISOString();});
+  var r=await sb.from('site_settings').upsert(rows,{onConflict:'key'});
+  if(r.error){toast('儲存失敗:'+r.error.message,true);return false;}
+  rows.forEach(function(x){RAW[x.key]=x.value;});
+  return true;
 }
 
-// ── DASHBOARD ──
-async function loadDashboard() {
-  var { data } = await sb.from('products').select('status,category');
-  var total = data ? data.length : 0;
-  var active = data ? data.filter(function(p){return p.status==='active';}).length : 0;
-  document.getElementById('dash-stats').innerHTML =
-    statCard(total,'全部產品','blue') +
-    statCard(active,'上架中','green') +
-    statCard(total-active,'下架','amber') +
-    statCard([...new Set((data||[]).map(function(p){return p.category;}))].length,'產品分類','');
+/* ============ 側邊選單 ============ */
+function buildSide(){
+  var h='<div class="g">網站內容</div>';
+  ZHIE_SCHEMA.forEach(function(s){h+='<a data-p="sec:'+s.id+'" onclick="go(\'sec:'+s.id+'\')">'+esc(s.title.replace(/\(.*$/,''))+'</a>';});
+  h+='<div class="g">資料管理</div>'
+   +'<a data-p="products" onclick="go(\'products\')">產品上下架・修改</a>'
+   +'<a data-p="sizes" onclick="go(\'sizes\')">各尺寸卡片照片</a>'
+   +'<a data-p="inq" onclick="go(\'inq\')">詢價收件匣</a>';
+  $('side').innerHTML=h;
 }
-function statCard(num,label,cls) {
-  return '<div class="stat-card '+cls+'">'
-    +'<div class="stat-num">'+num+'</div>'
-    +'<div class="stat-label">'+label+'</div>'
-    +'</div>';
-}
-
-// ── PRODUCTS ──
-async function loadProducts() {
-  var { data } = await sb.from('products').select('*').order('size_inch').order('model_name');
-  allProducts = data || [];
-  renderSizeFilter();
-  renderProductTable();
+function go(p){
+  CURPAGE=p;
+  document.querySelectorAll('#side a').forEach(function(a){a.classList.toggle('on',a.getAttribute('data-p')===p);});
+  $('side').classList.remove('open');
+  window.scrollTo(0,0);
+  if(p.indexOf('sec:')===0) renderSection(p.slice(4));
+  else if(p==='products') renderProducts();
+  else if(p==='sizes') renderSizes();
+  else if(p==='inq') renderInq();
 }
 
-function renderSizeFilter() {
-  var sizes = [...new Set(allProducts.map(function(p){return p.size_inch;}))].filter(Boolean).sort(function(a,b){return parseFloat(a)-parseFloat(b);});
-  var el = document.getElementById('prod-size-filter');
-  el.innerHTML = '<option value="">全部尺寸</option>';
-  sizes.forEach(function(s){ el.innerHTML += '<option>'+s+'</option>'; });
+/* ============ 通用欄位編輯(依 site-schema.js 自動產生) ============ */
+function fieldHtml(f,val,ctx){   // ctx: 屬性字串,標記這個欄位屬於哪個 key/第幾筆
+  var id=ctx;
+  if(f.type==='toggle') return '<label class="tg"><input type="checkbox" '+id+' '+(val==='1'?'checked':'')+'/> '+esc(f.label)+'</label>';
+  var h='<label class="l">'+esc(f.label)+'</label>';
+  if(f.type==='textarea') return h+'<textarea '+id+'>'+esc(val)+'</textarea>';
+  if(f.type==='image') return h+'<div class="imgbox">'+(val?'<img src="'+esc(val)+'"/>':'<span style="color:var(--mute);font-size:13px;">尚未設定圖片</span>')
+      +'<button class="btn btn-s" data-act="upload" '+id+'>'+(val?'更換圖片':'上傳圖片')+'</button>'
+      +(val?'<button class="btn btn-s btn-d" data-act="clearimg" '+id+'>清除</button>':'')+'</div>';
+  if(f.type==='num') return h+'<input type="number" step="0.1" '+id+' value="'+esc(val)+'"/>';
+  return h+'<input type="text" '+id+' value="'+esc(val)+'"/>';
 }
-
-function renderProductTable() {
-  var search = document.getElementById('prod-search').value.toLowerCase();
-  var cat = document.getElementById('prod-cat-filter').value;
-  var size = document.getElementById('prod-size-filter').value;
-  var filtered = allProducts.filter(function(p) {
-    if (cat && p.category !== cat) return false;
-    if (size && p.size_inch !== size) return false;
-    if (search && !((p.model_name||'').toLowerCase().includes(search)||(p.resolution||'').toLowerCase().includes(search))) return false;
-    return true;
-  });
-
-  if (!filtered.length) {
-    document.getElementById('prod-table-wrap').innerHTML = '<div class="empty"><i class="fa-solid fa-box-open" style="font-size:32px;display:block;margin-bottom:10px;"></i>查無產品</div>';
-    return;
-  }
-
-  // 按尺寸分組
-  var grouped = {};
-  filtered.forEach(function(p) {
-    var key = (p.size_inch||'其他')+'吋';
-    if (!grouped[key]) grouped[key] = [];
-    grouped[key].push(p);
-  });
-
-  var html = '<table class="tbl"><thead><tr>'
-    +'<th style="width:140px;">型號</th>'
-    +'<th>分類</th>'
-    +'<th>尺寸</th>'
-    +'<th>解析度</th>'
-    +'<th>觸控</th>'
-    +'<th>狀態</th>'
-    +'<th>圖片</th>'
-    +'<th style="width:100px;">操作</th>'
-    +'</tr></thead><tbody>';
-
-  Object.keys(grouped).sort(function(a,b){return parseFloat(a)-parseFloat(b);}).forEach(function(sizeKey) {
-    html += '<tr><td colspan="8" class="size-cat-header">'+sizeKey+' （'+grouped[sizeKey].length+' 款）</td></tr>';
-    grouped[sizeKey].forEach(function(p) {
-      var statusBadge = p.status==='active'
-        ? '<span class="badge b-green">上架中</span>'
-        : '<span class="badge b-gray">下架</span>';
-      var tpBadge = p.tp && p.tp!=='NA'
-        ? '<span class="badge b-blue">'+esc(p.tp)+'</span>'
-        : '<span class="badge b-gray">無</span>';
-      var imgCell = p.image_url
-        ? '<img src="'+esc(p.image_url)+'" style="width:40px;height:30px;object-fit:contain;border-radius:4px;border:1px solid var(--gray-200);" loading="lazy"/>'
-        : '<span style="color:var(--gray-300);font-size:11px;">無</span>';
-      html += '<tr>'
-        +'<td><span style="font-family:monospace;font-size:12px;font-weight:600;color:var(--blue);">'+esc(p.model_name)+'</span></td>'
-        +'<td><span class="badge b-blue" style="font-size:10px;">'+esc(p.category||'')+'</span></td>'
-        +'<td style="font-size:12px;">'+esc(p.panel_size||p.size_inch||'')+'</td>'
-        +'<td style="font-size:12px;">'+esc(p.resolution||'—')+'</td>'
-        +'<td>'+tpBadge+'</td>'
-        +'<td>'+statusBadge+'</td>'
-        +'<td>'+imgCell+'</td>'
-        +'<td>'
-        +'<button class="btn btn-ghost btn-sm" onclick="openProductModal(\''+p.id+'\')"><i class="fa-solid fa-pen"></i></button> '
-        +'<button class="btn btn-danger btn-sm" onclick="deleteProduct(\''+p.id+'\')"><i class="fa-solid fa-trash"></i></button>'
-        +'</td>'
-        +'</tr>';
-    });
-  });
-  html += '</tbody></table>';
-  document.getElementById('prod-table-wrap').innerHTML = html;
-}
-
-function openProductModal(id) {
-  var p = id ? allProducts.find(function(x){return x.id===id;}) : null;
-  document.getElementById('prod-modal-title').textContent = p ? '編輯產品 '+p.model_name : '新增產品';
-  document.getElementById('p-id').value = p ? p.id : '';
-  document.getElementById('p-img-url').value = p ? (p.image_url||'') : '';
-  document.getElementById('p-model').value = p ? (p.model_name||'') : '';
-  document.getElementById('p-panel').value = p ? (p.panel_size||'') : '';
-  document.getElementById('p-cat').value = p ? (p.category||'TFT彩色') : 'TFT彩色';
-  document.getElementById('p-size').value = p ? (p.size_inch||'') : '';
-  document.getElementById('p-tp').value = p ? (p.tp||'NA') : 'NA';
-  document.getElementById('p-res').value = p ? (p.resolution||'') : '';
-  document.getElementById('p-gray').value = p ? (p.gray_scale||'') : '';
-  document.getElementById('p-bright').value = p ? (p.brightness||'') : '';
-  document.getElementById('p-outline').value = p ? (p.outline_mm||'') : '';
-  document.getElementById('p-active').value = p ? (p.active_area_mm||'') : '';
-  document.getElementById('p-backlight').value = p ? (p.backlight_condition||'') : '';
-  document.getElementById('p-driver').value = p ? (p.driver_ic||'') : '';
-  document.getElementById('p-interface').value = p ? (p.interface||'') : '';
-  document.getElementById('p-pinout').value = p ? (p.pin_out||'') : '';
-  document.getElementById('p-temp').value = p ? (p.op_temp||'') : '';
-  document.getElementById('p-status').value = p ? (p.status||'active') : 'active';
-  document.getElementById('p-note').value = p ? (p.note||'') : '';
-
-  var prev = document.getElementById('prod-img-preview');
-  if (p && p.image_url) {
-    prev.innerHTML = '<img src="'+esc(p.image_url)+'" style="width:100%;height:100%;object-fit:contain;border-radius:var(--radius);"/>';
-  } else {
-    prev.innerHTML = '<span style="font-size:12px;color:var(--gray-300);">尚未上傳</span>';
-    prev.style.display = 'flex'; prev.style.alignItems = 'center'; prev.style.justifyContent = 'center';
-  }
-  cancelCrop('prod');
-  document.getElementById('modal-product').style.display = 'flex';
-}
-
-async function saveProduct() {
-  var id = document.getElementById('p-id').value;
-  var model = document.getElementById('p-model').value.trim();
-  if (!model) { showToast('請填入型號','error'); return; }
-
-  // 先上傳圖片（如果有待上傳的）
-  if (pendingUpload.prod) {
-    var imgUrl = await uploadImage(pendingUpload.prod, 'prod_'+model+'_'+Date.now()+'.jpg');
-    document.getElementById('p-img-url').value = imgUrl || '';
-    pendingUpload.prod = null;
-  }
-
-  var payload = {
-    model_name: model,
-    panel_size: document.getElementById('p-panel').value.trim(),
-    category: document.getElementById('p-cat').value,
-    size_inch: document.getElementById('p-size').value.trim(),
-    tp: document.getElementById('p-tp').value,
-    resolution: document.getElementById('p-res').value.trim(),
-    gray_scale: document.getElementById('p-gray').value.trim(),
-    brightness: document.getElementById('p-bright').value.trim(),
-    outline_mm: document.getElementById('p-outline').value.trim(),
-    active_area_mm: document.getElementById('p-active').value.trim(),
-    backlight_condition: document.getElementById('p-backlight').value.trim(),
-    driver_ic: document.getElementById('p-driver').value.trim(),
-    interface: document.getElementById('p-interface').value.trim(),
-    pin_out: document.getElementById('p-pinout').value.trim(),
-    op_temp: document.getElementById('p-temp').value.trim(),
-    status: document.getElementById('p-status').value,
-    note: document.getElementById('p-note').value.trim(),
-    image_url: document.getElementById('p-img-url').value || null,
-  };
-
-  var res;
-  if (id) {
-    res = await sb.from('products').update(payload).eq('id', id).select().single();
-    if (!res.error) allProducts = allProducts.map(function(p){ return p.id===id ? res.data : p; });
-  } else {
-    res = await sb.from('products').insert(payload).select().single();
-    if (!res.error) allProducts.unshift(res.data);
-  }
-  if (res.error) { showToast('儲存失敗：'+res.error.message,'error'); return; }
-  closeModal('modal-product');
-  renderProductTable();
-  showToast('產品已儲存');
-}
-
-async function deleteProduct(id) {
-  if (!confirm('確定要刪除這筆產品嗎？')) return;
-  var { error } = await sb.from('products').delete().eq('id', id);
-  if (error) { showToast('刪除失敗','error'); return; }
-  allProducts = allProducts.filter(function(p){ return p.id !== id; });
-  renderProductTable();
-  showToast('已刪除');
-}
-
-function startCrop(input, type) {
-  if (!input.files || !input.files[0]) return;
-  var file = input.files[0];
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    if (type === 'about') {
-      adminState.about = { scale:1, x:0, y:0, dragging:false, sx:0, sy:0, stx:0, sty:0 };
-      setAdminImg('about', e.target.result, 1, 0, 0);
-    } else {
-      var prevId = type==='prod' ? 'prod-img-preview' : type+'-img-preview';
-      document.getElementById(prevId).innerHTML = '<img src="'+e.target.result+'" style="width:100%;height:auto;display:block;border-radius:var(--radius);"/>';
-    }
-    pendingUpload[type] = file;
-    showToast('圖片已選取，調整好位置後請按儲存');
-  };
-  reader.readAsDataURL(file);
-  input.value = '';
-}
-function confirmCrop(type) {}
-function cancelCrop(type) {}
-
-async function uploadImage(file, filename) {
-  var { data, error } = await sb.storage.from('products').upload(filename, file, { upsert: true, contentType: 'image/jpeg' });
-  if (error) { showToast('圖片上傳失敗：'+error.message,'error'); return null; }
-  return SB_STORAGE + filename;
-}
-
-// ── HOMEPAGE ──
-async function loadHomepage() {
-  var {data}=await sb.from('site_settings').select('*').eq('key','hero_img').single();
-  if(data && data.value){
-    document.getElementById('hero-img-preview').innerHTML='<img src="'+data.value+'" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius);"/>';
-  }
-}
-
-async function saveHeroImg() {
-  if(!pendingUpload.hero){ showToast('請先上傳並裁切圖片','error'); return; }
-  var url=await uploadImage(pendingUpload.hero,'hero_'+Date.now()+'.jpg');
-  if(!url) return;
-  pendingUpload.hero=null;
-  await sb.from('site_settings').upsert({key:'hero_img',value:url,updated_at:new Date().toISOString()});
-  document.getElementById('hero-img-preview').innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius);"/>';
-  showToast('首頁圖片已更新！前台重新整理即可看到');
-}
-
-// ── ABOUT ──
-// ── ADMIN IMAGE ZOOM & DRAG ──
-var adminState = {
-  about: { scale:1, x:0, y:0, dragging:false, sx:0, sy:0, stx:0, sty:0 },
-  hero:  { scale:1, x:0, y:0, dragging:false, sx:0, sy:0, stx:0, sty:0 }
-};
-
-function adminZoom(e, type) {
-  e.preventDefault();
-  var img = document.querySelector('#about-img-preview img');
-  if (!img) return;
-  var s = adminState[type];
-  s.scale = Math.min(4, Math.max(0.3, s.scale - (e.deltaY > 0 ? 0.1 : -0.1)));
-  applyAdminTransform(type);
-}
-function adminDragStart(e, type) {
-  var img = document.querySelector('#about-img-preview img');
-  if (!img) return;
-  var s = adminState[type];
-  s.dragging = true; s.sx = e.clientX; s.sy = e.clientY;
-  s.stx = s.x; s.sty = s.y;
-}
-function adminDragMove(e, type) {
-  var s = adminState[type];
-  if (!s.dragging) return;
-  var img = document.querySelector('#about-img-preview img');
-  if (!img) return;
-  s.x = s.stx + (e.clientX - s.sx);
-  s.y = s.sty + (e.clientY - s.sy);
-  applyAdminTransform(type);
-}
-function adminDragEnd(type) { adminState[type].dragging = false; }
-function applyAdminTransform(type) {
-  var img = document.querySelector('#about-img-preview img');
-  if (!img) return;
-  var s = adminState[type];
-  img.style.transform = 'translate(calc(-50% + '+s.x+'px), calc(-50% + '+s.y+'px)) scale('+s.scale+')';
-}
-
-function setAdminImg(type, url, scale, x, y) {
-  var wrap = document.getElementById('about-img-preview');
-  var ph = document.getElementById('about-preview-ph');
-  if (ph) ph.style.display = 'none';
-  var existing = wrap.querySelector('img');
-  if (existing) existing.remove();
-  var img = document.createElement('img');
-  img.src = url;
-  img.style.cssText = 'position:absolute;top:50%;left:50%;transform-origin:center;width:100%;user-select:none;pointer-events:none;';
-  wrap.appendChild(img);
-  var s = adminState[type];
-  s.scale = parseFloat(scale)||1; s.x = parseFloat(x)||0; s.y = parseFloat(y)||0;
-  applyAdminTransform(type);
-}
-
-async function loadAbout() {
-  var {data} = await sb.from('site_settings').select('*').in('key',['about_title','about_desc','about_img','about_img_scale','about_img_x','about_img_y']);
-  if (!data) return;
-  var s = {};
-  data.forEach(function(r){ s[r.key] = r.value; });
-  document.getElementById('about-title').value = s.about_title || '';
-  document.getElementById('about-desc').value = s.about_desc || '';
-  if (s.about_img) {
-    setAdminImg('about', s.about_img, s.about_img_scale, s.about_img_x, s.about_img_y);
-  }
-}
-
-async function saveAbout() {
-  var imgUrl = null;
-  if (pendingUpload.about) {
-    imgUrl = await uploadImage(pendingUpload.about, 'about_'+Date.now()+'.jpg');
-    pendingUpload.about = null;
-  }
-  var st = adminState.about;
-  var updates = [
-    {key:'about_title', value:document.getElementById('about-title').value},
-    {key:'about_desc',  value:document.getElementById('about-desc').value},
-    {key:'about_img_scale', value:String(st.scale)},
-    {key:'about_img_x',     value:String(st.x)},
-    {key:'about_img_y',     value:String(st.y)},
-  ];
-  if (imgUrl) updates.push({key:'about_img', value:imgUrl});
-  await Promise.all(updates.map(function(u){
-    return sb.from('site_settings').upsert({key:u.key, value:u.value, updated_at:new Date().toISOString()});
-  }));
-  showToast('關於我們已儲存！前台將顯示目前調整的位置');
-}
-
-async function loadContact() {
-  var {data}=await sb.from('site_settings').select('*').in('key',['contact_email','contact_phone','contact_addr','contact_line']);
-  if(!data) return;
-  var s={};
-  data.forEach(function(r){s[r.key]=r.value;});
-  document.getElementById('c-email').value=s.contact_email||'info@zhietech.com';
-  document.getElementById('c-phone').value=s.contact_phone||'';
-  document.getElementById('c-addr').value=s.contact_addr||'台灣';
-  document.getElementById('c-line').value=s.contact_line||'';
-}
-
-async function saveContact() {
-  var updates=[
-    {key:'contact_email',value:document.getElementById('c-email').value},
-    {key:'contact_phone',value:document.getElementById('c-phone').value},
-    {key:'contact_addr',value:document.getElementById('c-addr').value},
-    {key:'contact_line',value:document.getElementById('c-line').value},
-  ];
-  await Promise.all(updates.map(function(u){
-    return sb.from('site_settings').upsert({key:u.key,value:u.value,updated_at:new Date().toISOString()});
-  }));
-  showToast('聯絡資訊已儲存');
-}
-
-// ── SETTINGS ──
-function loadSettings() {
-  document.getElementById('s-sb-url').value = localStorage.getItem('zhie_sb_url') || SB_URL;
-  document.getElementById('s-sb-key').value = localStorage.getItem('zhie_sb_key') || SB_KEY;
-}
-function saveAccount() {
-  var u = document.getElementById('s-user').value.trim();
-  var p = document.getElementById('s-pass').value;
-  if (u) { ADMIN_USER = u; localStorage.setItem('zhie_admin_user', u); }
-  if (p) { ADMIN_PASS = p; localStorage.setItem('zhie_admin_pass', p); }
-  showToast('帳號設定已儲存');
-}
-function saveSB() {
-  var url = document.getElementById('s-sb-url').value.trim();
-  var key = document.getElementById('s-sb-key').value.trim();
-  if (url) localStorage.setItem('zhie_sb_url', url);
-  if (key) localStorage.setItem('zhie_sb_key', key);
-  showToast('Supabase 設定已儲存，請重新整理頁面生效');
-}
-
-// ── EXCEL IMPORT ──
-function openExcelImport() {
-  excelData = [];
-  document.getElementById('excel-preview').innerHTML = '';
-  document.getElementById('excel-import-btn').style.display = 'none';
-  document.getElementById('modal-excel').style.display = 'flex';
-}
-
-function readExcel(input) {
-  if (!input.files || !input.files[0]) return;
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    var wb = XLSX.read(e.target.result, { type: 'binary' });
-    excelData = [];
-    wb.SheetNames.forEach(function(sheetName) {
-      var ws = wb.Sheets[sheetName];
-      var rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
-      var headerRow = -1;
-      rows.forEach(function(row, i) {
-        if (String(row[0]).includes('Model') || String(row[0]).includes('型號')) headerRow = i;
+function renderSection(sid){
+  var s=ZHIE_SCHEMA.filter(function(x){return x.id===sid;})[0];
+  var h='<h1>'+esc(s.title)+'</h1><div class="sub">改好後按最下方「儲存」,前台重新整理就會看到。</div><div class="card">';
+  s.fields.forEach(function(f){
+    if(f.type==='list'){
+      h+='<label class="l" style="margin-top:18px;font-weight:700;color:var(--navy);font-size:14px;">'+esc(f.label)+'</label>';
+      (CUR[f.k]||[]).forEach(function(it,i){
+        h+='<div class="item"><div class="h"><b>'+esc(f.itemLabel)+' '+(i+1)+'</b><span>'
+          +'<button class="btn btn-s" data-act="up" data-k="'+f.k+'" data-i="'+i+'">↑</button> '
+          +'<button class="btn btn-s" data-act="down" data-k="'+f.k+'" data-i="'+i+'">↓</button> '
+          +'<button class="btn btn-s btn-d" data-act="del" data-k="'+f.k+'" data-i="'+i+'">刪除</button></span></div>';
+        f.fields.forEach(function(sf){h+=fieldHtml(sf,it[sf.k],'data-k="'+f.k+'" data-i="'+i+'" data-sf="'+sf.k+'"');});
+        h+='</div>';
       });
-      if (headerRow < 0) return;
-      var sizeInch = sheetName.replace('吋','').trim();
-      for (var i = headerRow+1; i < rows.length; i++) {
-        var r = rows[i];
-        var model = String(r[0]||'').trim();
-        if (!model || (!model.startsWith('EF') && !model.startsWith('EP') && !model.startsWith('EM'))) continue;
-        excelData.push({
-          model_name: model,
-          panel_size: String(r[1]||'').trim(),
-          tp: String(r[2]||'NA').trim() || 'NA',
-          gray_scale: String(r[3]||'').trim(),
-          resolution: String(r[4]||'').trim(),
-          outline_mm: String(r[5]||'').replace(/\n/g,' / ').trim(),
-          active_area_mm: String(r[6]||'').trim(),
-          brightness: String(r[7]||'').trim(),
-          backlight_condition: String(r[8]||'').replace(/\n/g,' / ').trim(),
-          driver_ic: String(r[9]||'').replace(/\n/g,' / ').trim(),
-          interface: String(r[10]||'').replace(/\n/g,' / ').trim(),
-          pin_out: String(r[11]||'').replace(/\n/g,' / ').trim(),
-          op_temp: String(r[12]||'').trim(),
-          note: String(r[13]||'').trim(),
-          category: 'TFT彩色',
-          size_inch: sizeInch,
-          status: 'active',
-        });
-      }
-    });
-    if (!excelData.length) {
-      document.getElementById('excel-preview').innerHTML = '<div style="color:var(--red);font-size:13px;">找不到有效產品資料，請確認格式</div>';
-      return;
-    }
-    document.getElementById('excel-preview').innerHTML =
-      '<div style="background:var(--green-bg);border-radius:var(--radius);padding:10px 14px;font-size:13px;color:var(--green);margin-bottom:10px;">'
-      +'<b>找到 '+excelData.length+' 筆產品資料</b>，確認後將匯入資料庫</div>'
-      +'<table class="tbl"><thead><tr><th>型號</th><th>尺寸</th><th>解析度</th><th>觸控</th></tr></thead><tbody>'
-      +excelData.slice(0,10).map(function(p){
-        return '<tr><td style="font-family:monospace;font-size:11px;">'+esc(p.model_name)+'</td>'
-          +'<td>'+esc(p.size_inch)+'</td><td>'+esc(p.resolution)+'</td><td>'+esc(p.tp)+'</td></tr>';
-      }).join('')
-      +(excelData.length>10?'<tr><td colspan="4" style="text-align:center;color:var(--gray-500);">... 共 '+excelData.length+' 筆</td></tr>':'')
-      +'</tbody></table>';
-    document.getElementById('excel-import-btn').style.display = '';
-  };
-  reader.readAsBinaryString(input.files[0]);
+      if(!f.max||(CUR[f.k]||[]).length<f.max) h+='<button class="btn btn-s" data-act="add" data-k="'+f.k+'">＋ 新增'+esc(f.itemLabel)+'</button>';
+      else h+='<div style="font-size:12px;color:var(--mute);">已達上限 '+f.max+' 筆</div>';
+    } else h+=fieldHtml(f,CUR[f.k],'data-k="'+f.k+'"');
+  });
+  h+='</div><div class="savebar"><button class="btn btn-p" onclick="saveSection(\''+sid+'\')">儲存這一頁</button></div>';
+  var keep=window.scrollY;
+  $('pane').innerHTML=h;
+  window.scrollTo(0,keep);
 }
-
-async function importExcel() {
-  if (!excelData.length) return;
-  var btn = document.getElementById('excel-import-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> 匯入中...';
-  var { error } = await sb.from('products').insert(excelData);
-  if (error) { showToast('匯入失敗：'+error.message,'error'); btn.disabled=false; btn.innerHTML='確認匯入'; return; }
-  await loadProducts();
-  closeModal('modal-excel');
-  showToast('成功匯入 '+excelData.length+' 筆產品！');
-  btn.disabled=false; btn.innerHTML='確認匯入';
+function findField(k){var r=null;ZHIE_SCHEMA.forEach(function(s){s.fields.forEach(function(f){if(f.k===k)r=f;});});return r;}
+async function saveSection(sid){
+  var s=ZHIE_SCHEMA.filter(function(x){return x.id===sid;})[0];
+  var rows=s.fields.map(function(f){return {key:f.k,value:f.type==='list'?JSON.stringify(CUR[f.k]||[]):String(CUR[f.k]==null?'':CUR[f.k])};});
+  if(await saveRows(rows)) toast('已儲存!前台重新整理即可看到');
 }
-
-// ── UTILS ──
-function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function showToast(msg, type) {
-  var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show' + (type ? ' '+type : ' success');
-  clearTimeout(t._timer);
-  t._timer = setTimeout(function(){ t.classList.remove('show'); }, 3000);
-}
-
-window.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('l-pass').addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
+// 輸入事件(單行/多行/勾選)
+$('pane').addEventListener('input',function(e){
+  var el=e.target,k=el.getAttribute('data-k');if(!k)return;
+  var v=el.type==='checkbox'?(el.checked?'1':'0'):el.value;
+  if(el.hasAttribute('data-i')) CUR[k][+el.getAttribute('data-i')][el.getAttribute('data-sf')]=v; else CUR[k]=v;
 });
+// 按鈕事件(上傳/清除/新增/刪除/上下移)
+$('pane').addEventListener('click',async function(e){
+  var b=e.target.closest('[data-act]');if(!b)return;
+  var act=b.getAttribute('data-act'),k=b.getAttribute('data-k'),i=b.hasAttribute('data-i')?+b.getAttribute('data-i'):null,sf=b.getAttribute('data-sf');
+  if(act==='upload'){
+    var url=await pickAndUpload(k+(i!=null?'_'+i:''));if(!url)return;
+    if(i!=null) CUR[k][i][sf]=url; else CUR[k]=url;
+    renderSection(CURPAGE.slice(4));
+  } else if(act==='clearimg'){
+    if(i!=null) CUR[k][i][sf]=''; else CUR[k]='';
+    renderSection(CURPAGE.slice(4));
+  } else if(act==='add'){
+    var f=findField(k),o={};f.fields.forEach(function(x){o[x.k]='';});CUR[k].push(o);renderSection(CURPAGE.slice(4));
+  } else if(act==='del'){
+    if(!confirm('確定刪除這一筆?(按「儲存這一頁」後才會真的生效)'))return;
+    CUR[k].splice(i,1);renderSection(CURPAGE.slice(4));
+  } else if(act==='up'&&i>0){var a=CUR[k];var t=a[i];a[i]=a[i-1];a[i-1]=t;renderSection(CURPAGE.slice(4));}
+  else if(act==='down'&&i<CUR[k].length-1){var a2=CUR[k];var t2=a2[i];a2[i]=a2[i+1];a2[i+1]=t2;renderSection(CURPAGE.slice(4));}
+});
+
+/* ============ 圖片上傳(存到 Storage 的 products 桶/site 資料夾) ============ */
+function pickAndUpload(tag){
+  return new Promise(function(resolve){
+    var inp=document.createElement('input');inp.type='file';inp.accept='image/*';
+    inp.onchange=async function(){
+      if(!inp.files||!inp.files[0]){resolve(null);return;}
+      toast('圖片上傳中…');
+      var url=await uploadImage(inp.files[0],tag);
+      resolve(url);
+    };
+    inp.click();
+  });
+}
+async function shrink(file){   // 超過 2000px 的大圖先縮小(省空間、網頁較快);svg/gif 不處理
+  if(!/^image\/(jpeg|png|webp)$/.test(file.type)) return file;
+  var bmp;try{bmp=await createImageBitmap(file);}catch(e){return file;}
+  var max=2000;if(bmp.width<=max&&bmp.height<=max) return file;
+  var sc=max/Math.max(bmp.width,bmp.height),c=document.createElement('canvas');
+  c.width=Math.round(bmp.width*sc);c.height=Math.round(bmp.height*sc);
+  c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+  return await new Promise(function(res){c.toBlob(function(b){res(b||file);},file.type,0.9);});
+}
+async function uploadImage(file,tag){
+  var f=await shrink(file);
+  var ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'');
+  var path='site/'+String(tag).replace(/[^a-zA-Z0-9_-]/g,'')+'_'+Date.now()+'.'+ext;
+  var r=await sb.storage.from('products').upload(path,f,{contentType:file.type,upsert:false});
+  if(r.error){toast('上傳失敗:'+r.error.message,true);return null;}
+  toast('圖片已上傳(記得按「儲存」)');
+  return SB_STORAGE+path;
+}
+
+/* ============ 尺寸卡片照片 ============ */
+var SIZE_DEFAULT={'2':'2inch.jpg','3.5':'3_5inch.jpg','4.3':'4_3inch.jpg','5':'5inch.jpg','5.7':'5_7inch.jpg','6.86':'6_86inch.jpg','7':'7inch.jpg','8':'8inch.jpg','10.1':'10_1inch.jpg','12.1':'12_1inch.jpg'};
+async function renderSizes(){
+  $('pane').innerHTML='<h1>各尺寸卡片照片</h1><div class="sub">前台「產品」區每個尺寸卡片上的照片。換好照片後立即生效,不用再按儲存。</div><div class="card" id="sz">載入中…</div>';
+  var r=await sb.from('products').select('size_inch');
+  var set={};(r.data||[]).forEach(function(p){if(p.size_inch)set[p.size_inch]=1;});
+  var sizes=Object.keys(set).sort(function(a,b){return parseFloat(a)-parseFloat(b);});
+  var h='';
+  sizes.forEach(function(s){
+    var u=SIZEIMGS[s]||(SIZE_DEFAULT[s]?SB_STORAGE+SIZE_DEFAULT[s]:'');
+    h+='<div class="item"><div class="h"><b>'+esc(s)+' 吋</b></div><div class="imgbox">'+(u?'<img src="'+esc(u)+'"/>':'<span style="color:var(--mute);font-size:13px;">尚無照片</span>')
+      +'<button class="btn btn-s" onclick="changeSizeImg(\''+esc(s)+'\')">'+(u?'更換':'上傳')+'照片</button>'
+      +(SIZEIMGS[s]?'<button class="btn btn-s btn-d" onclick="resetSizeImg(\''+esc(s)+'\')">還原預設</button>':'')+'</div></div>';
+  });
+  $('sz').innerHTML=h||'目前沒有產品資料';
+}
+async function changeSizeImg(s){
+  var u=await pickAndUpload('size_'+s);if(!u)return;
+  SIZEIMGS[s]=u;
+  if(await saveRows([{key:'size_imgs',value:JSON.stringify(SIZEIMGS)}])){toast('已更新');renderSizes();}
+}
+async function resetSizeImg(s){
+  delete SIZEIMGS[s];
+  if(await saveRows([{key:'size_imgs',value:JSON.stringify(SIZEIMGS)}])){toast('已還原');renderSizes();}
+}
+
+/* ============ 產品 ============ */
+var PFIELDS=[
+ ['model_name','型號(必填)'],['size_inch','尺寸分組(前台卡片用,例:5、7、10.1)'],['panel_size','Panel Size(例:5.0)'],
+ ['resolution','解析度'],['tp','觸控(例:CTP,沒有填 NA)'],['gray_scale','灰階/面板類型'],
+ ['outline_mm','外型尺寸 Outline(mm)'],['active_area_mm','可視區 Active Area(mm)'],['brightness','亮度(nits,只填數字)'],
+ ['backlight_condition','背光條件'],['driver_ic','Driver IC'],['interface','介面 Interface'],
+ ['pin_out','Pin Out'],['op_temp','操作溫度(例:-20~70)'],['note','備註']
+];
+var PRODS=[],PQ='';
+async function renderProducts(){
+  $('pane').innerHTML='<h1>產品上下架・修改</h1><div class="sub">「上架中」才會出現在前台;不要顯示就改成「下架」(資料保留,可隨時再上架)。</div>'
+   +'<div class="card"><div style="display:flex;gap:8px;flex-wrap:wrap;"><input type="text" id="pq" placeholder="搜尋型號/尺寸/分類" style="flex:1;min-width:160px;" oninput="PQ=this.value;drawProducts()"/><button class="btn btn-p" onclick="editProduct(null)">＋ 新增產品</button></div>'
+   +'<div class="tbl-wrap" id="plist" style="margin-top:12px;">載入中…</div></div>';
+  var all=[],from=0;
+  for(;;){var r=await sb.from('products').select('*').order('size_inch').order('model_name').range(from,from+999);
+    if(r.error){$('plist').textContent='載入失敗:'+r.error.message;return;}
+    all=all.concat(r.data);if(r.data.length<1000)break;from+=1000;}
+  PRODS=all;drawProducts();
+}
+function drawProducts(){
+  var q=PQ.toLowerCase();
+  var list=PRODS.filter(function(p){return !q||[p.model_name,p.size_inch,p.category,p.resolution].join(' ').toLowerCase().indexOf(q)>=0;});
+  var h='<table><tr><th>型號</th><th>尺寸</th><th>分類</th><th>狀態</th><th></th></tr>';
+  list.slice(0,300).forEach(function(p){
+    h+='<tr><td><b>'+esc(p.model_name)+'</b></td><td>'+esc(p.size_inch)+'</td><td>'+esc(p.category)+'</td><td><span class="badge '+(p.status==='active'?'':'off')+'">'+(p.status==='active'?'上架中':'下架')+'</span></td>'
+     +'<td style="white-space:nowrap;"><button class="btn btn-s" onclick="editProduct(\''+p.id+'\')">編輯</button> <button class="btn btn-s" onclick="toggleProduct(\''+p.id+'\')">'+(p.status==='active'?'下架':'上架')+'</button></td></tr>';
+  });
+  h+='</table>'+(list.length>300?'<div class="sub" style="margin-top:8px;">只顯示前 300 筆,請用搜尋縮小範圍(共 '+list.length+' 筆)</div>':'<div class="sub" style="margin-top:8px;">共 '+list.length+' 筆</div>');
+  $('plist').innerHTML=h;
+}
+async function toggleProduct(id){
+  var p=PRODS.filter(function(x){return x.id===id;})[0];var ns=p.status==='active'?'inactive':'active';
+  var r=await sb.from('products').update({status:ns,updated_at:new Date().toISOString()}).eq('id',id);
+  if(r.error){toast('失敗:'+r.error.message,true);return;}
+  p.status=ns;drawProducts();toast(ns==='active'?'已上架':'已下架');
+}
+var EDITP=null;
+function editProduct(id){
+  EDITP=id?JSON.parse(JSON.stringify(PRODS.filter(function(x){return x.id===id;})[0])):{status:'active',category:((CUR.prod_cats||[])[0]||{}).value||'',sort_order:0};
+  var cats=(CUR.prod_cats||[]).map(function(c){return c.value;});
+  if(EDITP.category&&cats.indexOf(EDITP.category)<0) cats.push(EDITP.category);
+  var h='<h1>'+(id?'編輯產品':'新增產品')+'</h1><div class="row2">';
+  h+='<div><label class="l">產品分類</label><select data-pf="category">'+cats.map(function(c){return '<option value="'+esc(c)+'"'+(c===EDITP.category?' selected':'')+'>'+esc(c)+'</option>';}).join('')+'</select></div>';
+  h+='<div><label class="l">狀態</label><select data-pf="status"><option value="active"'+(EDITP.status==='active'?' selected':'')+'>上架中(前台顯示)</option><option value="inactive"'+(EDITP.status!=='active'?' selected':'')+'>下架(前台不顯示)</option></select></div>';
+  PFIELDS.forEach(function(f){h+='<div><label class="l">'+esc(f[1])+'</label><input type="text" data-pf="'+f[0]+'" value="'+esc(EDITP[f[0]])+'"/></div>';});
+  h+='</div><label class="l">產品圖片(選填;沒設定就用該尺寸的卡片照片)</label><div class="imgbox" id="pimg"></div>';
+  h+='<div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;"><button class="btn btn-p" onclick="saveProduct()">儲存</button><button class="btn" onclick="closeP()">取消</button>'
+    +(id?'<button class="btn btn-d" style="margin-left:auto;" onclick="deleteProduct()">刪除這筆產品</button>':'')+'</div>';
+  $('pmodal-in').innerHTML=h;drawPimg();$('pmodal').classList.add('on');
+}
+function drawPimg(){
+  $('pimg').innerHTML=(EDITP.image_url?'<img src="'+esc(EDITP.image_url)+'"/>':'<span style="color:var(--mute);font-size:13px;">未設定</span>')
+   +'<button class="btn btn-s" onclick="pickPimg()">'+(EDITP.image_url?'更換':'上傳')+'圖片</button>'+(EDITP.image_url?'<button class="btn btn-s btn-d" onclick="EDITP.image_url=null;drawPimg()">清除</button>':'');
+}
+async function pickPimg(){var u=await pickAndUpload('product');if(u){EDITP.image_url=u;drawPimg();}}
+function closeP(){$('pmodal').classList.remove('on');}
+$('pmodal').addEventListener('input',function(e){var k=e.target.getAttribute('data-pf');if(k)EDITP[k]=e.target.value;});
+async function saveProduct(){
+  if(!String(EDITP.model_name||'').trim()){toast('請填型號',true);return;}
+  var row={};PFIELDS.forEach(function(f){row[f[0]]=EDITP[f[0]]==null?'':String(EDITP[f[0]]).trim();});
+  row.category=EDITP.category;row.status=EDITP.status;row.image_url=EDITP.image_url||null;row.updated_at=new Date().toISOString();
+  var r=EDITP.id?await sb.from('products').update(row).eq('id',EDITP.id):await sb.from('products').insert(row);
+  if(r.error){toast('儲存失敗:'+r.error.message,true);return;}
+  toast('已儲存');closeP();renderProducts();
+}
+async function deleteProduct(){
+  if(!confirm('確定要永久刪除「'+EDITP.model_name+'」?刪除後無法復原。(只是暫時不顯示請用「下架」)'))return;
+  var r=await sb.from('products').delete().eq('id',EDITP.id);
+  if(r.error){toast('刪除失敗:'+r.error.message,true);return;}
+  toast('已刪除');closeP();renderProducts();
+}
+
+/* ============ 詢價收件匣 ============ */
+async function renderInq(){
+  $('pane').innerHTML='<h1>詢價收件匣</h1><div class="sub">客人在前台按「送出詢價」的內容都會收在這裡。</div><div class="card" id="iq">載入中…</div>';
+  var r=await sb.from('inquiries').select('*').order('created_at',{ascending:false}).limit(200);
+  if(r.error){$('iq').innerHTML='<div class="warn">還沒啟用:詢價資料表尚未建立(需先執行 SQL 01)。<br/>'+esc(r.error.message)+'</div>';return;}
+  if(!r.data.length){$('iq').textContent='目前沒有詢價';return;}
+  var h='<div class="tbl-wrap"><table><tr><th>時間</th><th>公司</th><th>Email</th><th>需求</th><th></th></tr>';
+  r.data.forEach(function(x){
+    var d=new Date(x.created_at);
+    h+='<tr style="'+(x.status==='new'?'background:#f3f8ff;':'')+'"><td style="white-space:nowrap;">'+d.toLocaleString('zh-TW')+'</td><td>'+esc(x.company)+'</td><td><a href="mailto:'+esc(x.email)+'">'+esc(x.email)+'</a></td><td style="white-space:pre-wrap;">'+esc(x.message)+'</td>'
+     +'<td style="white-space:nowrap;"><button class="btn btn-s" onclick="inqDone(\''+x.id+'\',\''+(x.status==='new'?'done':'new')+'\')">'+(x.status==='new'?'標記已處理':'改回未處理')+'</button> <button class="btn btn-s btn-d" onclick="inqDel(\''+x.id+'\')">刪除</button></td></tr>';
+  });
+  $('iq').innerHTML=h+'</table></div>';
+}
+async function inqDone(id,st){var r=await sb.from('inquiries').update({status:st}).eq('id',id);if(r.error)toast(r.error.message,true);else renderInq();}
+async function inqDel(id){if(!confirm('確定刪除這筆詢價?'))return;var r=await sb.from('inquiries').delete().eq('id',id);if(r.error)toast(r.error.message,true);else renderInq();}
 </script>
 </body>
 </html>
