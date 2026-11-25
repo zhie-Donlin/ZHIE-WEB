@@ -65,6 +65,10 @@ th{color:var(--mute);font-size:12px;font-weight:600;}
 .modal{position:fixed;inset:0;background:rgba(15,32,87,.45);display:none;align-items:flex-start;justify-content:center;padding:16px;z-index:60;overflow-y:auto;}
 .modal.on{display:flex;}
 .modal .in{background:#fff;border-radius:14px;padding:22px;width:100%;max-width:680px;margin:20px 0;}
+.pw{position:relative;}
+.pw input{padding-right:44px;}
+.eye{position:absolute;right:4px;top:50%;transform:translateY(-50%);border:none;background:none;font-size:18px;padding:6px 8px;line-height:1;opacity:.6;}
+.eye:hover,.eye.on{opacity:1;}
 .warn{background:#fff6e0;border:1px solid #f0d58a;color:#7a5b00;border-radius:10px;padding:10px 14px;font-size:13px;margin-bottom:14px;}
 @media(max-width:800px){
   .menu-btn{display:inline-block;}
@@ -88,7 +92,7 @@ th{color:var(--mute);font-size:12px;font-weight:600;}
     <label class="l">管理員 Email</label>
     <input type="email" id="lg-email" autocomplete="username" placeholder="zhie@zhietech.com"/>
     <label class="l">密碼</label>
-    <input type="password" id="lg-pass" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <div class="pw"><input type="password" id="lg-pass" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/><button type="button" class="eye" onclick="toggleEye(this)" aria-label="顯示或隱藏密碼" title="顯示/隱藏密碼">👁</button></div>
     <div id="lg-err" style="color:var(--red);font-size:13px;margin-top:10px;display:none;"></div>
     <button class="btn btn-p" style="width:100%;margin-top:16px;" onclick="doLogin()">登入</button>
     <p style="font-size:12px;color:var(--mute);text-align:center;margin-top:14px;">忘記密碼請聯絡網站管理員協助重設</p>
@@ -175,7 +179,8 @@ function buildSide(){
   h+='<div class="g">資料管理</div>'
    +'<a data-p="products" onclick="go(\'products\')">產品上下架・修改</a>'
    +'<a data-p="sizes" onclick="go(\'sizes\')">各尺寸卡片照片</a>'
-   +'<a data-p="inq" onclick="go(\'inq\')">詢價收件匣</a>';
+   +'<a data-p="inq" onclick="go(\'inq\')">詢價收件匣</a>'
+   +'<div class="g">帳號</div><a data-p="pwd" onclick="go(\'pwd\')">更改我的密碼</a>';
   $('side').innerHTML=h;
 }
 function go(p){
@@ -187,6 +192,32 @@ function go(p){
   else if(p==='products') renderProducts();
   else if(p==='sizes') renderSizes();
   else if(p==='inq') renderInq();
+  else if(p==='pwd') renderPwd();
+}
+
+/* ============ 更改自己的密碼(Supabase Auth updateUser) ============ */
+var EYE='<button type="button" class="eye" onclick="toggleEye(this)" aria-label="顯示或隱藏密碼" title="顯示/隱藏密碼">👁</button>';
+function toggleEye(b){   // 點眼睛:顯示/隱藏同一格的密碼
+  var i=b.parentNode.querySelector('input');
+  var show=i.type==='password';i.type=show?'text':'password';b.classList.toggle('on',show);
+}
+function renderPwd(){
+  $('pane').innerHTML='<h1>更改我的密碼</h1><div class="sub">登入中的帳號:'+esc($('who').textContent)+'。密碼至少 8 個字元。</div>'
+   +'<div class="card" style="max-width:420px;"><label class="l">新密碼</label><div class="pw"><input type="password" id="pw1" autocomplete="new-password"/>'+EYE+'</div>'
+   +'<label class="l">再輸入一次新密碼</label><div class="pw"><input type="password" id="pw2" autocomplete="new-password" onkeydown="if(event.key===\'Enter\')changePwd()"/>'+EYE+'</div>'
+   +'<div id="pw-msg" style="font-size:13px;margin-top:10px;"></div>'
+   +'<button class="btn btn-p" style="margin-top:14px;" onclick="changePwd()">更改密碼</button></div>';
+}
+async function changePwd(){
+  var a=$('pw1').value,b=$('pw2').value,m=$('pw-msg');
+  m.style.color='var(--red)';
+  if(a.length<8){m.textContent='密碼至少要 8 個字元';return;}
+  if(a!==b){m.textContent='兩次輸入的密碼不一樣';return;}
+  var r=await sb.auth.updateUser({password:a});
+  if(r.error){m.textContent='更改失敗:'+r.error.message;return;}
+  $('pw1').value='';$('pw2').value='';
+  m.style.color='var(--green)';m.textContent='密碼已更改!下次登入請用新密碼。';
+  toast('密碼已更改');
 }
 
 /* ============ 通用欄位編輯(依 site-schema.js 自動產生) ============ */
