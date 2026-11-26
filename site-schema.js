@@ -12,7 +12,7 @@
 var ZHIE_SCHEMA = [
 { id:'common', title:'網站共用(Logo・公司名・選單・頁尾)', fields:[
   {k:'site_title', label:'瀏覽器分頁標題', type:'text', def:'致一科技 ZHIE Technology — 專業顯示模組'},
-  {k:'site_favicon', label:'網站小圖示(分頁上的小圖)', type:'image', def:'logo.png'},
+  {k:'site_favicon', label:'網站小圖示(分頁上的小圖)', type:'image', def:'favicon-192.png'},
   {k:'logo_img', label:'頂端 Logo 圖', type:'image', def:'logo.png'},
   {k:'alt_logo', label:'Logo 圖片說明文字(搜尋引擎/視障用,不會顯示)', type:'text', def:'ZHIE'},
   {k:'company_zh', label:'公司中文名(頂端)', type:'text', def:'致一科技有限公司'},

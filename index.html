@@ -4,7 +4,20 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>致一科技 ZHIE Technology — 專業顯示模組</title>
-<link rel="icon" type="image/png" href="logo.png"/>
+<meta name="description" content="致一科技深耕 LCD Module 與電容式觸控屏設計開發，擁有超過 15 年光電產業經驗，為工業、醫療、車載等領域提供高品質客製化顯示解決方案。"/>
+<link rel="canonical" href="https://www.zhietech.com/"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="致一科技 ZHIE Technology"/>
+<meta property="og:url" content="https://www.zhietech.com/"/>
+<meta property="og:title" content="致一科技 ZHIE Technology — 專業顯示模組"/>
+<meta property="og:description" content="致一科技深耕 LCD Module 與電容式觸控屏設計開發，擁有超過 15 年光電產業經驗，為工業、醫療、車載等領域提供高品質客製化顯示解決方案。"/>
+<meta property="og:image" content="https://www.zhietech.com/og-image.png"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png"/>
+<link rel="apple-touch-icon" href="apple-touch-icon.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="site-schema.js"></script>
@@ -248,7 +261,7 @@ textarea.form-input{resize:none;height:88px;line-height:1.6;}
 <nav class="nav">
   <div class="nav-inner">
     <a href="#" class="nav-logo">
-      <img src="logo.png" id="logo-img" alt="ZHIE"/>
+      <img src="logo.png" id="logo-img" alt="ZHIE" width="53" height="44"/>
       <div class="nav-logo-text">
         <span class="nav-logo-text-zh" data-k="company_zh"></span>
         <span class="nav-logo-text-en" data-k="company_en"></span>
@@ -622,8 +635,13 @@ function applyConfig(){
   document.querySelectorAll('[data-k]').forEach(function(el){el.textContent=T(el.getAttribute('data-k'));});
   document.querySelectorAll('[data-ph]').forEach(function(el){el.placeholder=T(el.getAttribute('data-ph'));});
   document.title=T('site_title');
-  var fav=document.querySelector('link[rel="icon"]');
-  if(fav&&T('site_favicon')) fav.href=T('site_favicon');
+  // 後台有自訂小圖示才覆蓋(預設用輕量的 favicon-32/192.png,不載入 3MB 的 logo.png)
+  var fav=document.querySelector('link[rel="icon"][sizes="32x32"]');
+  if(fav&&T('site_favicon')&&T('site_favicon')!=='logo.png') fav.href=T('site_favicon');
+  // 讓分享預覽/搜尋說明跟著後台文字(爬蟲若不執行 JS 則看上方預設值)
+  var md=document.querySelector('meta[name="description"]'); if(md&&T('hero_desc')) md.content=T('hero_desc');
+  var ot=document.querySelector('meta[property="og:title"]'); if(ot&&T('site_title')) ot.content=T('site_title');
+  var od=document.querySelector('meta[property="og:description"]'); if(od&&T('hero_desc')) od.content=T('hero_desc');
   var lg=document.getElementById('logo-img');
   if(lg){ if(T('logo_img')) lg.src=T('logo_img'); lg.alt=T('alt_logo'); }
 
@@ -646,7 +664,7 @@ function applyConfig(){
   if(T('about_img')){
     var b=document.getElementById('about-img');
     var sc=parseFloat(T('about_img_scale'))||1, tx=parseFloat(T('about_img_x'))||0, ty=parseFloat(T('about_img_y'))||0;
-    b.innerHTML='<img src="'+esc(T('about_img'))+'" alt="'+esc(T('alt_about'))+'" style="position:absolute;top:50%;left:50%;transform:translate(calc(-50% + '+tx+'px), calc(-50% + '+ty+'px)) scale('+sc+');transform-origin:center;width:100%;"/>';
+    b.innerHTML='<img src="'+esc(T('about_img'))+'" alt="'+esc(T('alt_about'))+'" loading="lazy" style="position:absolute;top:50%;left:50%;transform:translate(calc(-50% + '+tx+'px), calc(-50% + '+ty+'px)) scale('+sc+');transform-origin:center;width:100%;"/>';
   }
   // 公司環境照片
   var gal=(T('gallery_imgs')||[]).filter(function(g){return g&&g.img;});

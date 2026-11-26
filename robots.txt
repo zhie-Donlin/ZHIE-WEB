@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /manage-zhie-2024.html
+
+Sitemap: https://www.zhietech.com/sitemap.xml
