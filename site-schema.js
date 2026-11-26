@@ -119,6 +119,8 @@ var ZHIE_SCHEMA = [
   {k:'contact_desc', label:'聯絡區說明', type:'textarea', def:'無論標準規格選型或全客製化開發，我們的團隊都能提供專業建議與快速報價。'},
   {k:'show_email', label:'前台顯示 Email', type:'toggle', def:'1'},
   {k:'contact_email', label:'Email(顯示在前台)', type:'text', def:'info@zhietech.com'},
+  {k:'show_person', label:'前台顯示聯絡人', type:'toggle', def:'0'},
+  {k:'contact_person', label:'聯絡人(例:王先生 業務部)', type:'text', def:''},
   {k:'show_phone', label:'前台顯示電話', type:'toggle', def:'0'},
   {k:'contact_phone', label:'電話', type:'text', def:''},
   {k:'show_line', label:'前台顯示 LINE', type:'toggle', def:'0'},

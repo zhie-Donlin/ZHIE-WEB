@@ -114,7 +114,7 @@ body{font-family:'Noto Sans TC','Inter',system-ui,sans-serif;background:#f4f6f9;
 .back-btn:hover{text-decoration:underline;}
 .product-list-title{font-size:22px;font-weight:700;color:var(--navy);}
 .product-list-count{font-size:13px;color:var(--gray-500);}
-.prod-table-wrap{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius-lg);overflow:hidden;}
+.prod-table-wrap{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius-lg);overflow-x:auto;-webkit-overflow-scrolling:touch;}
 .prod-table{width:100%;border-collapse:collapse;font-size:13px;}
 .prod-table th{background:var(--gray-50);padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--gray-500);letter-spacing:0.05em;text-transform:uppercase;border-bottom:1px solid var(--gray-200);white-space:nowrap;}
 .prod-table td{padding:12px 14px;border-bottom:1px solid var(--gray-100);color:var(--gray-900);vertical-align:middle;}
@@ -234,7 +234,7 @@ textarea.form-input{resize:none;height:88px;line-height:1.6;}
 
   .footer-inner{flex-direction:column;text-align:center;}
 
-  .prod-table{font-size:12px;}
+  .prod-table{font-size:12px;min-width:640px;}
   .prod-table th,.prod-table td{padding:9px 8px;}
 }
 </style>
@@ -664,13 +664,16 @@ function applyConfig(){
   }).join('');
   // 聯絡資訊(各自勾選是否顯示)
   var rows='';
-  function row(icon,txt){rows+='<div class="contact-row"><div class="c-icon">'+icon+'</div><div class="c-text">'+esc(txt)+'</div></div>';}
+  function row(icon,txt){var a=[].concat(txt);rows+='<div class="contact-row"><div class="c-icon">'+icon+'</div><div class="c-text">'+a.map(esc).join('<br>')+'</div></div>';}
   if(T('show_email')==='1'&&T('contact_email')) row('📧',T('contact_email'));
+  if(T('show_person')==='1'&&T('contact_person')) row('👤',T('contact_person'));
   if(T('show_phone')==='1'&&T('contact_phone')) row('📞',T('contact_phone'));
   if(T('show_line')==='1'&&T('contact_line')) row('💬','LINE: '+T('contact_line'));
   if(T('show_web')==='1'&&T('contact_web')) row('🌐',T('contact_web'));
-  if(T('show_addr')==='1'&&T('contact_addr')) row('📍',T('contact_addr'));
-  if(T('show_addr_en')==='1'&&T('contact_addr_en')) row('📍',T('contact_addr_en'));
+  var addrs=[];
+  if(T('show_addr')==='1'&&T('contact_addr')) addrs.push(T('contact_addr'));
+  if(T('show_addr_en')==='1'&&T('contact_addr_en')) addrs.push(T('contact_addr_en'));
+  if(addrs.length) row('📍',addrs);
   document.getElementById('contact-rows').innerHTML=rows;
   var mb=document.getElementById('map-box');
   var mq=T('map_query')||T('contact_addr');
